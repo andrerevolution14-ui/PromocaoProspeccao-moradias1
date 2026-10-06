@@ -3,7 +3,6 @@
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import ExecutiveBannerDark from "@/components/ExecutiveBannerDark";
 import WhatWeBuy from "@/components/WhatWeBuy";
 import WhatWeDontBuy from "@/components/WhatWeDontBuy";
 import HowItWorks from "@/components/HowItWorks";
@@ -20,32 +19,29 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-1">
-        {/* 1. Hero Section (Above Fold with Dynamic Parameters & Single Main CTA) */}
+        {/* 1. Hero Section (Above Fold - Single Main CTA) */}
         <Hero />
 
-        {/* 1.5 Executive Dark & Warm Orange Highlight Banner (+3 Terrenos Comprados nos Últimos 6 Meses) */}
-        <ExecutiveBannerDark />
-
-        {/* 2. What We Buy Section (High-Liquidity Criteria & Aveiro Range) */}
+        {/* 2. What We Buy Section (Com Design Escuro & Laranja Quente) */}
         <WhatWeBuy />
 
-        {/* 3. What We Don't Buy Section (Red Flags / Disqualifiers) */}
+        {/* 3. What We Don't Buy Section (Linhas Vermelhas) */}
         <WhatWeDontBuy />
 
-        {/* 4. How Our Process Works (3-Step Flow) */}
+        {/* 4. How Our Process Works (Fluxo de 3 Passos) */}
         <HowItWorks />
 
-        {/* 5. Quick Summary Box (Visual Highlight, Mobile-First) */}
+        {/* 5. Quick Summary Box (Destaque dos 3 Requisitos) */}
         <QuickSummaryBox />
 
-        {/* 6. Social Proof & Authority Section */}
+        {/* 6. Mais Sobre Nós (Antigo Social Proof - Apenas Fotos Reais das Obras) */}
         <SocialProof />
       </main>
 
       {/* 7. Final CTA Section (Footer) */}
       <FinalCTA />
 
-      {/* Floating CTA Button (Sticky to viewport) */}
+      {/* Floating CTA Button (Sticky) */}
       <FloatingWhatsApp />
 
     </div>

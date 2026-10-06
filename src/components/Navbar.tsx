@@ -22,9 +22,9 @@ export default function Navbar() {
           
           {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-11 h-11 rounded-xl bg-white p-1 border border-[#E7DFD5] flex items-center justify-center shadow-xs overflow-hidden">
+            <div className="relative w-12 h-12 rounded-2xl bg-white p-1 border border-[#E7DFD5] flex items-center justify-center shadow-xs overflow-hidden">
               <img
-                src="/social-proof/logo-freitas.png"
+                src="/logo-freitas.png"
                 alt="Logo Grupo Freitas"
                 className="w-full h-full object-contain"
               />
@@ -51,7 +51,7 @@ export default function Navbar() {
               Como Funciona
             </a>
             <a href="#projetos" className="hover:text-[#B45309] transition-colors">
-              Obras & Confiança
+              Mais Sobre Nós
             </a>
             <a 
               href="https://grupofreitasrenovacoes.pt/" 
@@ -125,7 +125,7 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-medium text-[#44403C]"
           >
-            Obras Realizadas
+            Mais Sobre Nós
           </a>
           <div className="pt-3 border-t border-[#E7DFD5] flex flex-col gap-2">
             <button

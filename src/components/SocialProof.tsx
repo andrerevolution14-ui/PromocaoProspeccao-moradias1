@@ -1,55 +1,40 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
-import { ShieldCheck, Award, ExternalLink, CheckCircle2, Building, Eye, ChevronRight } from "lucide-react";
+import { ShieldCheck, Award, ExternalLink, CheckCircle2, Eye, ChevronRight } from "lucide-react";
 
 export default function SocialProof() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Fotografias reais da pasta /public/social-proof fornecidas pelo Grupo Freitas
-  const proofItems = [
+  // Apenas as fotografias REAIS das obras do Grupo Freitas (sem imagens geradas por IA)
+  const realWorks = [
     {
       src: "/social-proof/obra-fachada-1.jpeg",
       title: "Construção de Moradia Contemporânea",
       location: "Distrito de Aveiro",
-      type: "Obra Real Grupo Freitas",
-      desc: "Execução com arquitetura moderna, grandes vãos e isolamento térmico de última geração."
+      type: "Estrutura & Alvenarias",
+      desc: "Execução de moradia com isolamento térmico avançado, vãos amplos e conformidade rigorosa com o projeto de arquitetura."
     },
     {
       src: "/social-proof/obra-fachada-2.jpeg",
-      title: "Projeto de Moradia em Desenvolvimento",
+      title: "Desenvolvimento e Execução de Obra",
       location: "Região de Aveiro",
-      type: "Terreno com Projeto Adquirido",
-      desc: "Terreno comprado diretamente para promoção própria. CPCV firmado com fundos próprios."
+      type: "Construção de Raiz",
+      desc: "Acompanhamento diário por encarregados e engenheiros do Grupo Freitas para garantir máxima qualidade construtiva."
     },
     {
       src: "/social-proof/obra-quarto.jpeg",
       title: "Acabamentos Interiores de Alto Padrão",
       location: "Aveiro",
-      type: "Qualidade de Execução",
-      desc: "Pavimentos flutuantes nobres, iluminação embutida e carpintarias sob medida."
+      type: "Carpintarias & Pavimentos",
+      desc: "Pavimentos nobres flutuantes, iluminação LED embutida e acabamentos de requinte prontos a habitar."
     },
     {
       src: "/social-proof/obra-wc.jpeg",
-      title: "Casas de Banho Contemporâneas",
+      title: "Instalações Sanitárias Contemporâneas",
       location: "Aveiro",
-      type: "Design & Rigor Construtivo",
-      desc: "Revestimentos cerâmicos de grande formato, louças suspensas e torneiras de embutir."
-    },
-    {
-      src: "/social-proof/moradia-1.jpg",
-      title: "Moradia T4 Térrea com Cobertura Plana",
-      location: "Esgueira, Aveiro",
-      type: "Aquisição nos Últimos 6 Meses",
-      desc: "Lote de gaveto com projeto aprovado. CPCV assinado em 72h e escritura célere."
-    },
-    {
-      src: "/social-proof/moradia-2.jpg",
-      title: "Moradia T3 Isolada com Piscina",
-      location: "Ílhavo / Gafanhas",
-      type: "Negócio Direto Sem Intermediários",
-      desc: "Venda direta pelo proprietário com zero comissões e sinal pago no ato do contrato."
+      type: "Design & Materiais Nobres",
+      desc: "Revestimentos cerâmicos de grande formato, louças suspensas e soluções modernas de canalização e eficiência hídrica."
     }
   ];
 
@@ -57,19 +42,19 @@ export default function SocialProof() {
     <section id="projetos" className="py-16 sm:py-24 bg-[#FAF7F2] border-t border-[#E7DFD5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Authority & Trust Header */}
+        {/* Header - Mais Sobre Nós */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#1C1917] text-[#F5EFEB] text-xs font-bold uppercase tracking-wider mb-4 shadow-xs">
             <Award className="w-3.5 h-3.5 text-[#F59E0B]" />
-            <span>Social Proof • Resultados & Confiança Real</span>
+            <span>Empresa de Construção em Aveiro</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1C1917] tracking-tight">
-            Social Proof — Quem Somos e o Que Já Realizámos
+            Mais Sobre Nós
           </h2>
           
           <p className="mt-4 text-base sm:text-lg text-[#57534E] leading-relaxed">
-            Somos o <strong>Grupo Freitas Renovações</strong>, empresa de construção consolidada com atuação no distrito de Aveiro. Já comprámos <strong>mais de 3 terrenos com projeto nos últimos 6 meses</strong> com capital próprio para construção imediata.
+            Somos o <strong>Grupo Freitas Renovações</strong>, empresa de construção civil e desenvolvimento imobiliário sediada e ativa no distrito de Aveiro. Quando compramos o seu terreno com projeto, compramos com <strong>capital próprio</strong> para iniciar a execução da obra no menor prazo possível.
           </p>
         </div>
 
@@ -81,7 +66,7 @@ export default function SocialProof() {
             <div className="flex items-center gap-4 pr-4">
               <div className="relative w-16 h-16 rounded-2xl bg-white p-2 border border-[#E7DFD5] flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                 <img
-                  src="/social-proof/logo-freitas.png"
+                  src="/logo-freitas.png"
                   alt="Logo Grupo Freitas Renovações"
                   className="w-full h-full object-contain"
                 />
@@ -109,7 +94,7 @@ export default function SocialProof() {
             <div className="flex items-center gap-4 pt-4 md:pt-0 md:px-6">
               <div className="relative w-16 h-16 rounded-2xl bg-white p-2 border border-[#E7DFD5] flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                 <img
-                  src="/social-proof/camara-aveiro-logo.png"
+                  src="/camara-aveiro-logo.png"
                   alt="Câmara Municipal de Aveiro"
                   className="w-full h-full object-contain"
                 />
@@ -137,7 +122,7 @@ export default function SocialProof() {
                   Compromisso de Confidencialidade
                 </div>
                 <p className="text-xs text-[#57534E] mt-1 leading-snug">
-                  Tratamos os seus documentos com total confidencialidade. Empresa de construção a atuar no distrito de Aveiro.
+                  Tratamos os seus documentos com total sigilo e proteção. Empresa de construção consolidada no distrito de Aveiro.
                 </p>
               </div>
             </div>
@@ -149,26 +134,26 @@ export default function SocialProof() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
             <h3 className="text-2xl font-black text-[#1C1917] tracking-tight">
-              Galeria de Social Proof
+              Obras e Execuções Reais
             </h3>
             <p className="text-sm text-[#78716C] mt-1">
-              Imagens reais de obras, interiores e moradias contemporâneas executadas na região de Aveiro.
+              Registo fotográfico de trabalhos reais de construção e acabamento desenvolvidos pela nossa equipa técnica.
             </p>
           </div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#B45309] bg-[#F5EFEB] px-3.5 py-1.5 rounded-full border border-[#E7DFD5] w-fit">
-            Casos Reais Concluídos
+            Obras Concluídas em Aveiro
           </span>
         </div>
 
-        {/* 6 Real Images Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {proofItems.map((item, idx) => (
+        {/* 4 Real Images Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {realWorks.map((item, idx) => (
             <div
               key={idx}
               onClick={() => setSelectedImage(item.src)}
               className="group bg-white rounded-3xl overflow-hidden border border-[#E7DFD5] shadow-sm hover:shadow-2xl hover:border-[#D4C7B5] transition-all duration-300 cursor-pointer flex flex-col"
             >
-              <div className="relative aspect-[16/11] w-full overflow-hidden bg-[#E7DFD5]">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#E7DFD5]">
                 <img
                   src={item.src}
                   alt={item.title}
@@ -176,22 +161,22 @@ export default function SocialProof() {
                 />
                 
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 text-[#1C1917] text-xs font-bold shadow-lg">
-                    <Eye className="w-3.5 h-3.5" /> Ver em detalhe
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 text-[#1C1917] text-xs font-bold shadow-lg">
+                    <Eye className="w-3.5 h-3.5" /> Ampliar foto
                   </span>
                 </div>
 
-                <div className="absolute top-3 left-3 bg-[#1C1917]/85 backdrop-blur-sm text-white px-3 py-1 rounded-full text-[11px] font-semibold">
+                <div className="absolute top-3 left-3 bg-[#1C1917]/85 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[11px] font-semibold">
                   {item.location}
                 </div>
               </div>
 
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+              <div className="p-5 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-wider text-[#B45309] mb-1">
                     {item.type}
                   </div>
-                  <h4 className="text-lg font-bold text-[#1C1917] group-hover:text-[#B45309] transition-colors leading-tight">
+                  <h4 className="text-base font-bold text-[#1C1917] group-hover:text-[#B45309] transition-colors leading-snug">
                     {item.title}
                   </h4>
                   <p className="text-xs text-[#57534E] mt-2 leading-relaxed">
@@ -199,7 +184,7 @@ export default function SocialProof() {
                   </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-[#F5EFEB] flex items-center justify-between text-xs text-[#78716C]">
+                <div className="pt-3 mt-4 border-t border-[#F5EFEB] flex items-center justify-between text-xs text-[#78716C]">
                   <span>Padrão Grupo Freitas</span>
                   <span className="font-bold text-[#1C1917] flex items-center gap-1">
                     Ver <ChevronRight className="w-3 h-3 text-[#B45309]" />
@@ -220,7 +205,7 @@ export default function SocialProof() {
               rel="noopener noreferrer"
               className="font-bold text-[#B45309] hover:underline inline-flex items-center gap-1"
             >
-              grupofreitasrenovacoes.pt <ExternalLink className="w-3.5 h-3.5" />
+              grupofreitasrenovacoes.pt <ExternalLink className="w-3 h-3" />
             </a>
           </p>
         </div>
@@ -233,18 +218,18 @@ export default function SocialProof() {
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-5xl w-full max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl bg-black">
+          <div className="relative max-w-4xl w-full max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl bg-black">
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute top-4 right-4 z-10 bg-black/60 text-white p-2.5 rounded-full hover:bg-black"
             >
               ✕
             </button>
-            <div className="relative w-full h-[70vh] flex items-center justify-center">
+            <div className="relative w-full h-[75vh] flex items-center justify-center p-2">
               <img
                 src={selectedImage}
-                alt="Social Proof detalhe de obra Grupo Freitas"
-                className="max-h-full max-w-full object-contain"
+                alt="Fotografia real de obra do Grupo Freitas"
+                className="max-h-full max-w-full object-contain rounded-lg"
               />
             </div>
           </div>

@@ -187,9 +187,13 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-[#1C1917] text-white font-extrabold flex items-center justify-center text-base">
-                GF
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-white p-0.5 border border-[#E7DFD5] flex items-center justify-center shadow-xs overflow-hidden shrink-0">
+                <img
+                  src="/logo-freitas.png"
+                  alt="Logo Grupo Freitas"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <span className="font-extrabold text-sm tracking-tight block">

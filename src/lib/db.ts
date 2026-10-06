@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { Lead } from "./leads-store";
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING;
 
 export const hasDb = Boolean(connectionString);
 

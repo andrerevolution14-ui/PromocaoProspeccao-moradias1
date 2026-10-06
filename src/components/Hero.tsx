@@ -1,32 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
-import { MessageCircle, Clock, ShieldCheck, Banknote, Sparkles, MapPin, Euro, CheckCircle2, ChevronDown } from "lucide-react";
+import { MessageCircle, Clock, ShieldCheck, Banknote, Sparkles, MapPin, CheckCircle2 } from "lucide-react";
 import { trackAndOpenWhatsApp } from "@/lib/tracking";
-import { SITE_CONFIG, getWhatsAppUrl } from "@/lib/config";
+import { SITE_CONFIG } from "@/lib/config";
 
 export default function Hero() {
-  const [selectedLocation, setSelectedLocation] = useState("Aveiro Centro (Glória e Vera Cruz)");
-  const [selectedStatus, setSelectedStatus] = useState("Projeto de Arquitetura Aprovado");
-  const [askingPrice, setAskingPrice] = useState("");
-  const [role, setRole] = useState("Proprietário Direto");
-
   const handleMainCTA = () => {
-    const url = getWhatsAppUrl({
-      location: selectedLocation,
-      projectStatus: selectedStatus,
-      askingPrice: askingPrice,
-      role: role
-    });
-
     trackAndOpenWhatsApp({
-      ctaOrigin: "Hero Main CTA (Configurado)",
-      location: selectedLocation,
-      role: role,
-      askingPrice: askingPrice,
-      customMessage: `Olá André, tenho um terreno em ${selectedLocation} com ${selectedStatus}${askingPrice ? `, valor pretendido: ${askingPrice}` : ""} (${role}). Gostaria de enviar a planta em PDF para análise.`,
-      notes: `Lead com valores selecionados no Hero: ${selectedLocation} | ${selectedStatus} | ${askingPrice || "S/ valor"}`
+      ctaOrigin: "Hero Main CTA",
+      customMessage: SITE_CONFIG.defaultWhatsAppMessage
     });
   };
 
@@ -65,104 +49,22 @@ export default function Hero() {
           </p>
         </div>
 
-        {/* Interactive Fast Lead Box (Frictionless, Direct to WhatsApp) */}
-        <div className="mt-8 sm:mt-10 max-w-3xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl p-5 sm:p-7 border-2 border-[#E7DFD5] shadow-xl">
-          
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-[#F5EFEB]">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#78716C] flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-[#B45309]" /> Configure os dados do seu terreno para o WhatsApp:
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setRole(role === "Proprietário Direto" ? "Mediador / Consultor" : "Proprietário Direto")}
-                className="text-[11px] font-bold text-[#B45309] bg-[#F5EFEB] hover:bg-[#EBE3D7] px-2.5 py-1 rounded-lg border border-[#E7DFD5] transition-colors"
-              >
-                Perfil: {role} ⇄
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-            
-            {/* 1. Localização */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#57534E] mb-1">
-                Localização (Zona)
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full appearance-none bg-[#FAF8F5] border border-[#E7DFD5] rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#B45309]/50 pr-8"
-                >
-                  {SITE_CONFIG.locations.map((loc) => (
-                    <option key={loc} value={loc}>
-                      {loc}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-[#78716C] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-
-            {/* 2. Estado do Projeto */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#57534E] mb-1">
-                Estado do Projeto
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="w-full appearance-none bg-[#FAF8F5] border border-[#E7DFD5] rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#B45309]/50 pr-8"
-                >
-                  <option value="Projeto de Arquitetura Aprovado">Arquitetura Aprovada</option>
-                  <option value="Arquitetura com Licenças a Pagamento">Licenças a Pagamento</option>
-                  <option value="PIP Aprovado + Projeto Completo">PIP Aprovado + Projeto</option>
-                  <option value="Em fase final de aprovação">Em fase final de aprovação</option>
-                </select>
-                <ChevronDown className="w-4 h-4 text-[#78716C] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-
-            {/* 3. Valor Pretendido */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#57534E] mb-1">
-                Valor Pretendido (€)
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Ex: 150.000 €"
-                  value={askingPrice}
-                  onChange={(e) => setAskingPrice(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-[#E7DFD5] rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#B45309]/50"
-                />
-                <Euro className="w-3.5 h-3.5 text-[#A8A29E] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-
-          </div>
-
-          {/* THE SINGLE MAIN CTA BUTTON */}
-          <div>
-            <button
-              onClick={handleMainCTA}
-              className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white py-4 sm:py-5 px-6 rounded-2xl font-black text-base sm:text-lg shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
-            >
-              <MessageCircle className="w-6 h-6 fill-white shrink-0" />
-              <span>💬 Falar com o André no WhatsApp</span>
-            </button>
-            <p className="text-[11px] text-center text-[#78716C] mt-2">
-              ⚡ Ao clicar, as informações acima são formatadas automaticamente na sua mensagem para o André.
-            </p>
-          </div>
-
+        {/* Main Single CTA Button - Limpo, Direto e de Alta Conversão */}
+        <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-2.5 max-w-md mx-auto">
+          <button
+            onClick={handleMainCTA}
+            className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white py-4.5 sm:py-5 px-8 rounded-2xl font-black text-lg sm:text-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+          >
+            <MessageCircle className="w-6 h-6 fill-white shrink-0" />
+            <span>Falar com o André no WhatsApp</span>
+          </button>
+          <p className="text-xs text-center text-[#78716C] font-semibold">
+            ⚡ Resposta direta pelo construtor em menos de 48 horas
+          </p>
         </div>
 
         {/* 4 Trust Value Badges */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
+        <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
           <div className="bg-white/90 backdrop-blur-sm border border-[#E7DFD5] rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 shadow-xs">
             <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] text-[#B45309] flex items-center justify-center shrink-0">
               <Clock className="w-5 h-5" />

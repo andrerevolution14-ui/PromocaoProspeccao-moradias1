@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MapPin, Compass, Home, Layers, CheckCircle, ArrowRight, MessageCircle } from "lucide-react";
+import { MapPin, Compass, Home, Layers, CheckCircle, ArrowRight, MessageCircle, Award, Sparkles } from "lucide-react";
 import { trackAndOpenWhatsApp } from "@/lib/tracking";
 
 export default function WhatWeBuy() {
@@ -19,7 +19,7 @@ export default function WhatWeBuy() {
       badge: "Localização Prioritária",
       title: "Localização Estratégica",
       subtitle: "Aveiro Centro e Cintura num Raio de 10 a 15 km",
-      description: "Terrenos bem localizados, com bons acessos viários e a menos de 5 minutos dos nós da A17 ou A25. Compramos em toda a área de influência:",
+      description: "Terrenos bem localizados, com bons acessos viários e a menos de 5 minutos dos nós da A17 ou A25. Compramos em toda a área envolvente:",
       highlights: [
         "Aveiro Centro (freguesias da Glória e Vera Cruz)",
         "Santa Joana e São Bernardo",
@@ -78,65 +78,79 @@ export default function WhatWeBuy() {
   ];
 
   return (
-    <section id="o-que-compramos" className="py-16 sm:py-24 bg-[#FAF7F2] border-t border-[#E7DFD5]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="o-que-compramos" className="py-20 sm:py-28 bg-[#181615] text-white relative overflow-hidden border-t-2 border-[#B45309]/30">
+      
+      {/* Radiant Orange / Amber Glows (O Design Escuro/Laranja Pedido) */}
+      <div className="absolute top-0 right-10 w-[500px] h-[500px] bg-[#D97706]/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-[#B45309]/20 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:28px_28px] opacity-40 pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#15803D]/10 text-[#15803D] text-xs font-bold uppercase tracking-wider mb-3">
-            <CheckCircle className="w-3.5 h-3.5" /> Critérios de Alta Liquidez
+        {/* Section Header with Warm Orange Tag */}
+        <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#B45309]/30 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-bold uppercase tracking-wider mb-4 shadow-md">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Critérios de Alta Liquidez • Compra Direta</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1C1917] tracking-tight">
+
+          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
             O Que Compramos Diretamente
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-[#57534E] leading-relaxed">
-            Para garantirmos uma decisão rápida, focamo-nos em projetos específicos que o nosso modelo de construção permite executar com máxima eficiência:
+          
+          <p className="mt-4 text-base sm:text-lg text-[#D6D3D1] leading-relaxed">
+            Para garantirmos uma decisão rápida e assinatura imediata de CPCV, focamo-nos em projetos específicos que o nosso modelo de construção permite executar com máxima eficiência:
           </p>
+
+          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-xs sm:text-sm font-semibold text-[#FDE68A]">
+            <Award className="w-4 h-4 text-[#F59E0B]" />
+            <span>Mais de 3 Terrenos com Projeto Comprados nos Últimos 6 Meses em Aveiro</span>
+          </div>
         </div>
 
-        {/* 4 Cards Grid */}
+        {/* 4 Cards Grid with Dark & Warm Amber Design */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {criteria.map((item, idx) => {
             const Icon = item.icon;
             return (
               <div
                 key={item.id}
-                className="group bg-white rounded-3xl p-7 sm:p-8 border border-[#E7DFD5] shadow-sm hover:shadow-xl hover:border-[#D4C7B5] transition-all duration-300 flex flex-col justify-between"
+                className="group bg-[#231F1D] rounded-3xl p-7 sm:p-9 border border-[#443D39] hover:border-[#F59E0B]/60 shadow-xl hover:shadow-[0_10px_35px_rgba(217,119,6,0.15)] transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-12 h-12 rounded-2xl bg-[#F5EFEB] text-[#B45309] group-hover:bg-[#B45309] group-hover:text-white flex items-center justify-center transition-colors shadow-xs">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-13 h-13 rounded-2xl bg-[#B45309]/20 text-[#F59E0B] border border-[#B45309]/40 group-hover:bg-[#B45309] group-hover:text-white flex items-center justify-center transition-colors shadow-md">
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#78716C] bg-[#FAF7F2] px-3 py-1 rounded-full border border-[#E7DFD5]">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#B45309]/15 px-3 py-1 rounded-full border border-[#B45309]/30">
                       {item.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-bold text-[#1C1917] group-hover:text-[#B45309] transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-[#FBBF24] transition-colors">
                     {item.title}
                   </h3>
-                  <div className="text-sm font-semibold text-[#B45309] mt-0.5 mb-3">
+                  <div className="text-sm font-semibold text-[#F59E0B] mt-1 mb-3">
                     {item.subtitle}
                   </div>
-                  <p className="text-sm text-[#57534E] mb-4">
+                  <p className="text-sm text-[#A8A29E] mb-5 leading-relaxed">
                     {item.description}
                   </p>
 
                   {/* Highlights list */}
-                  <ul className="space-y-2 mb-6">
+                  <ul className="space-y-2.5 mb-6">
                     {item.highlights.map((h, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#292524] font-medium">
-                        <CheckCircle className="w-4 h-4 text-[#15803D] shrink-0 mt-0.5" />
+                      <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#E7E5E4] font-medium">
+                        <CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" />
                         <span>{h}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="pt-4 border-t border-[#F5EFEB] flex items-center justify-between text-xs text-[#78716C]">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-[#A8A29E]">
                   <span>💡 {item.note}</span>
-                  <span className="font-bold text-[#B45309] group-hover:translate-x-1 transition-transform">0{idx + 1}</span>
+                  <span className="font-extrabold text-[#F59E0B] text-sm">0{idx + 1}</span>
                 </div>
               </div>
             );
@@ -144,12 +158,12 @@ export default function WhatWeBuy() {
         </div>
 
         {/* Section Bottom Action Banner */}
-        <div className="mt-12 bg-white rounded-2xl p-6 sm:p-8 border border-[#E7DFD5] shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-1 text-center md:text-left">
-            <h4 className="text-lg font-bold text-[#1C1917]">
+        <div className="mt-12 bg-gradient-to-r from-[#231F1D] via-[#2A2421] to-[#231F1D] rounded-3xl p-6 sm:p-9 border-2 border-[#B45309]/40 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1.5 text-center md:text-left">
+            <h4 className="text-xl font-black text-white">
               O seu terreno cumpre estes critérios?
             </h4>
-            <p className="text-sm text-[#78716C]">
+            <p className="text-sm text-[#D6D3D1]">
               Basta enviar-nos o PDF do projeto e a localização. Em 48 horas dizemos-lhe o valor que pagamos.
             </p>
           </div>
@@ -157,10 +171,10 @@ export default function WhatWeBuy() {
           <div className="flex items-center gap-3 w-full md:w-auto">
             <button
               onClick={handleCTA}
-              className="w-full md:w-auto inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20BD5A] text-white px-7 py-4 rounded-xl font-black text-sm shadow-md hover:shadow-lg transition-all"
+              className="w-full md:w-auto inline-flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white px-8 py-4.5 rounded-2xl font-black text-base shadow-xl hover:shadow-[0_0_30px_rgba(37,211,102,0.4)] transition-all"
             >
-              <MessageCircle className="w-5 h-5 fill-white" />
-              <span>💬 Falar com o André no WhatsApp</span>
+              <MessageCircle className="w-5 h-5 fill-white shrink-0" />
+              <span>Falar com o André no WhatsApp</span>
             </button>
           </div>
         </div>
