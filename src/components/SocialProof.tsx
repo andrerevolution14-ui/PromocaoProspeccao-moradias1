@@ -62,14 +62,10 @@ export default function SocialProof() {
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E7DFD5] shadow-sm mb-14">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center divide-y md:divide-y-0 md:divide-x divide-[#E7DFD5]">
             
-            {/* Grupo Freitas Brand with REAL LOGO */}
+            {/* Grupo Freitas Brand with GF emblem */}
             <div className="flex items-center gap-4 pr-4">
-              <div className="relative w-16 h-16 rounded-2xl bg-white p-2 border border-[#E7DFD5] flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-                <img
-                  src="/logo-freitas.png"
-                  alt="Logo Grupo Freitas Renovações"
-                  className="w-full h-full object-contain"
-                />
+              <div className="w-16 h-16 rounded-2xl bg-[#1C1917] text-white font-black text-2xl flex items-center justify-center shrink-0 shadow-md border border-[#38332E]">
+                GF
               </div>
               <div>
                 <div className="font-extrabold text-base text-[#1C1917] leading-tight">

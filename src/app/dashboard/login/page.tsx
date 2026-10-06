@@ -44,12 +44,8 @@ export default function LoginPage() {
         {/* Brand Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-white p-1 border border-[#E7DFD5] flex items-center justify-center shadow-xs overflow-hidden">
-              <img
-                src="/logo-freitas.png"
-                alt="Logo Grupo Freitas"
-                className="w-full h-full object-contain"
-              />
+            <div className="w-11 h-11 rounded-xl bg-[#1C1917] flex items-center justify-center text-[#F5EFEB] font-black text-xl shadow-md">
+              GF
             </div>
             <span className="font-extrabold text-xl text-[#1C1917] tracking-tight">
               GRUPO FREITAS

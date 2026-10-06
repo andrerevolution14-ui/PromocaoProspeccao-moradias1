@@ -22,12 +22,8 @@ export default function Navbar() {
           
           {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-12 h-12 rounded-2xl bg-white p-1 border border-[#E7DFD5] flex items-center justify-center shadow-xs overflow-hidden">
-              <img
-                src="/logo-freitas.png"
-                alt="Logo Grupo Freitas"
-                className="w-full h-full object-contain"
-              />
+            <div className="w-11 h-11 rounded-xl bg-[#1C1917] flex items-center justify-center text-[#F5EFEB] font-black text-xl shadow-md group-hover:bg-[#B45309] transition-colors">
+              GF
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-[#1C1917] text-lg tracking-tight leading-tight group-hover:text-[#B45309] transition-colors">
