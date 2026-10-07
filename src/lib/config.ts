@@ -23,7 +23,11 @@ export const SITE_CONFIG = {
     email: process.env.ADMIN_EMAIL || "andre@grupofreitasrenovacoes.pt",
     password: process.env.ADMIN_PASSWORD || "2005",
     pin: process.env.ADMIN_PIN || "2005"
-  }
+  },
+  metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID || "979841341182458",
+  metaConversionsApiToken:
+    process.env.META_CONVERSIONS_API_ACCESS_TOKEN ||
+    "EAAT9k03bEqsBSgjVoa82Fet3Yiurus5KtnXVbjnPh6eVD42uNpHjz4uJsZAgZCRYrg4jcPZBZCIXZBPbNrCdrMzKryYhF0c07LSM2qmkIBvJ2OpsgIigbbcBVLFByCi6d8ZALAg87QREmel4XtaTh75xWR60eKdNYeYjvkTdCZAp4jZCk0dGoJiFVJAxneHXYAZDZD"
 };
 
 /**

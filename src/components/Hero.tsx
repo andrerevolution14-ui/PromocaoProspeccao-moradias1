@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { MessageCircle, Clock, ShieldCheck, Banknote, Sparkles, MapPin, CheckCircle2 } from "lucide-react";
 import { trackAndOpenWhatsApp } from "@/lib/tracking";
 import { SITE_CONFIG } from "@/lib/config";
+import LeadModal from "@/components/LeadModal";
 
 export default function Hero() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleMainCTA = () => {
     trackAndOpenWhatsApp({
       ctaOrigin: "Hero Main CTA",
@@ -58,10 +61,26 @@ export default function Hero() {
             <MessageCircle className="w-6 h-6 fill-white shrink-0" />
             <span>Falar com o André no WhatsApp</span>
           </button>
+          
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="text-xs sm:text-sm font-bold text-[#B45309] hover:text-[#92400E] underline decoration-[#D4C7B5] py-1 transition-colors"
+          >
+            📋 Ou preencher formulário rápido do terreno (48h)
+          </button>
+
           <p className="text-xs text-center text-[#78716C] font-semibold">
             ⚡ Resposta direta pelo construtor em menos de 48 horas
           </p>
         </div>
+
+        {/* Modal de Lead */}
+        <LeadModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          ctaOrigin="Hero Formulário Análise 48h"
+        />
 
         {/* 4 Trust Value Badges */}
         <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">

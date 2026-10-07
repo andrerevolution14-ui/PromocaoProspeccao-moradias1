@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Send, CheckCircle2, Building2, User, MapPin, Euro } from "lucide-react";
+import { X, Send, CheckCircle2, Building2, User, MapPin, Euro, Phone } from "lucide-react";
 import { trackAndOpenWhatsApp } from "@/lib/tracking";
 import { SITE_CONFIG } from "@/lib/config";
 
@@ -16,6 +16,8 @@ export default function LeadModal({ isOpen, onClose, ctaOrigin }: LeadModalProps
   const [location, setLocation] = useState<string>("Esgueira");
   const [projectStatus, setProjectStatus] = useState<string>("Projeto Arquitetura Aprovado");
   const [askingPrice, setAskingPrice] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -25,7 +27,8 @@ export default function LeadModal({ isOpen, onClose, ctaOrigin }: LeadModalProps
     setIsSubmitting(true);
 
     const priceInfo = askingPrice ? ` | Valor pretendido: ${askingPrice}` : "";
-    const msg = `Olá André, tenho um terreno em ${location} com ${projectStatus} (${role})${priceInfo}. Gostaria de enviar a planta em PDF para análise.`;
+    const nameInfo = name ? ` (${name})` : "";
+    const msg = `Olá André, tenho um terreno em ${location} com ${projectStatus} (${role})${priceInfo}${nameInfo}. Gostaria de enviar a planta em PDF para análise.`;
 
     await trackAndOpenWhatsApp({
       ctaOrigin: ctaOrigin,
@@ -33,6 +36,8 @@ export default function LeadModal({ isOpen, onClose, ctaOrigin }: LeadModalProps
       location: location,
       askingPrice: askingPrice,
       customMessage: msg,
+      phone: phone,
+      name: name,
       notes: `Submetido via Modal Rápido (${projectStatus})`
     });
 
@@ -164,6 +169,38 @@ export default function LeadModal({ isOpen, onClose, ctaOrigin }: LeadModalProps
               onChange={(e) => setAskingPrice(e.target.value)}
               className="w-full bg-white border border-[#E7DFD5] rounded-xl px-3.5 py-3 text-sm font-medium text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#B45309]/50"
             />
+          </div>
+
+          {/* Nome e Contacto (Opcional) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#44403C] mb-1.5">
+                <span className="flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-[#B45309]" /> O Seu Nome (Opcional)
+                </span>
+              </label>
+              <input
+                type="text"
+                placeholder="Ex: João Silva"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-white border border-[#E7DFD5] rounded-xl px-3.5 py-3 text-sm font-medium text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#B45309]/50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#44403C] mb-1.5">
+                <span className="flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-[#B45309]" /> Telemóvel (Opcional)
+                </span>
+              </label>
+              <input
+                type="tel"
+                placeholder="Ex: 912 345 678"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-white border border-[#E7DFD5] rounded-xl px-3.5 py-3 text-sm font-medium text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#B45309]/50"
+              />
+            </div>
           </div>
 
           {/* Submit CTA */}

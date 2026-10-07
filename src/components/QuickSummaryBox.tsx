@@ -1,10 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FileText, MapPin, Euro, MessageCircle, Zap, ShieldCheck } from "lucide-react";
 import { trackAndOpenWhatsApp } from "@/lib/tracking";
+import LeadModal from "@/components/LeadModal";
 
 export default function QuickSummaryBox() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleQuickCTA = () => {
     trackAndOpenWhatsApp({
       ctaOrigin: "Caixa Resumo Rápido",
@@ -106,7 +109,22 @@ export default function QuickSummaryBox() {
                   <MessageCircle className="w-6 h-6 fill-white shrink-0" />
                   <span>💬 Enviar estes 3 dados no WhatsApp</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full text-center text-xs text-[#F59E0B] hover:text-[#FBBF24] underline decoration-white/20 py-1 transition-colors"
+                >
+                  Ou preencher formulário rápido no site ↗
+                </button>
               </div>
+
+              {/* Modal de Lead */}
+              <LeadModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                ctaOrigin="Caixa Resumo Formulário"
+              />
 
               <div className="text-[11px] text-[#A8A29E] pt-2 border-t border-white/10">
                 🔒 Total confidencialidade garantida pela equipa técnica do Grupo Freitas.
