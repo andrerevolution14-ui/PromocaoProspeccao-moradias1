@@ -3,7 +3,7 @@ export const SITE_CONFIG = {
   companyName: "Grupo Freitas Renovações",
   websiteUrl: "https://grupofreitasrenovacoes.pt/",
   contactPerson: "André",
-  // Número WhatsApp indicado pelo utilizador: +351 920 601 070
+  // Número WhatsApp: +351 920 601 070 (formato wa.me: 351920601070)
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "351920601070",
   defaultWhatsAppMessage: "Olá André, tenho um terreno com projeto em Aveiro. Gostaria de enviar os detalhes para análise.",
   locations: [
