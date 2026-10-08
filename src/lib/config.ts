@@ -1,10 +1,36 @@
+export const OFFICIAL_WHATSAPP_NUMBER = "351920601070";
+export const OFFICIAL_WHATSAPP_DISPLAY = "+351 920 601 070";
+
+/**
+ * Garante que o número de WhatsApp seja sempre o correto (+351 920 601 070 -> 351920601070).
+ * Protege ativamente contra variáveis de ambiente antigas na Vercel ou cache do Next.js
+ * que contenham o erro antigo (35192060170 sem o dígito zero).
+ */
+export function getCleanWhatsAppNumber(): string {
+  const envVal = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+  if (!envVal || typeof envVal !== "string") {
+    return OFFICIAL_WHATSAPP_NUMBER;
+  }
+  const digits = envVal.replace(/[^0-9]/g, "");
+  // Se for o número antigo com falta de dígito ou tamanho incorreto
+  if (
+    digits === "35192060170" ||
+    digits === "92060170" ||
+    digits.length !== 12 ||
+    digits.startsWith("35192060170")
+  ) {
+    return OFFICIAL_WHATSAPP_NUMBER;
+  }
+  return digits;
+}
+
 // Configuração central da landing page e contactos
 export const SITE_CONFIG = {
   companyName: "Grupo Freitas Renovações",
   websiteUrl: "https://grupofreitasrenovacoes.pt/",
   contactPerson: "André",
   // Número WhatsApp: +351 920 601 070 (formato wa.me: 351920601070)
-  whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "351920601070",
+  whatsappNumber: getCleanWhatsAppNumber(),
   defaultWhatsAppMessage: "Olá André, tenho um terreno com projeto em Aveiro. Gostaria de enviar os detalhes para análise.",
   locations: [
     "Aveiro Centro (Glória e Vera Cruz)",
@@ -41,7 +67,7 @@ export function getWhatsAppUrl(params?: {
   role?: string;
   customMessage?: string;
 }): string {
-  const cleanNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || SITE_CONFIG.whatsappNumber).replace(/[^0-9]/g, "");
+  const cleanNumber = getCleanWhatsAppNumber();
 
   if (params?.customMessage) {
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(params.customMessage)}`;
