@@ -3,8 +3,8 @@ export const SITE_CONFIG = {
   companyName: "Grupo Freitas Renovações",
   websiteUrl: "https://grupofreitasrenovacoes.pt/",
   contactPerson: "André",
-  // Número WhatsApp indicado pelo utilizador: +351 92060170
-  whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "35192060170",
+  // Número WhatsApp indicado pelo utilizador: +351 920 601 070
+  whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "351920601070",
   defaultWhatsAppMessage: "Olá André, tenho um terreno com projeto em Aveiro. Gostaria de enviar os detalhes para análise.",
   locations: [
     "Aveiro Centro (Glória e Vera Cruz)",
