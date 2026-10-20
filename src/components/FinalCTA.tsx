@@ -2,14 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { MessageCircle, ShieldCheck, CheckCircle2, Lock, ArrowUp, ExternalLink } from "lucide-react";
-import { trackAndOpenWhatsApp } from "@/lib/tracking";
+import { MessageCircle, ShieldCheck, CheckCircle2, Lock, ArrowUp, ExternalLink, ArrowRight } from "lucide-react";
+import { scrollToLeadForm, trackAndOpenWhatsApp } from "@/lib/tracking";
 import { SITE_CONFIG } from "@/lib/config";
 
 export default function FinalCTA() {
   const handleFinalWhatsApp = () => {
     trackAndOpenWhatsApp({
-      ctaOrigin: "Rodapé Final (Botão Principal)",
+      ctaOrigin: "Rodapé Final (WhatsApp)",
       customMessage: SITE_CONFIG.defaultWhatsAppMessage
     });
   };
@@ -31,36 +31,45 @@ export default function FinalCTA() {
         {/* Pre-title & Headline */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#B45309]/20 border border-[#B45309]/40 text-[#F59E0B] text-xs font-bold uppercase tracking-wider mb-6">
           <CheckCircle2 className="w-4 h-4" />
-          <span>Fase Ativa de Aquisições • Distrito de Aveiro</span>
+          <span>A comprar terrenos • Região de Aveiro</span>
         </div>
 
         <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight max-w-3xl mx-auto">
-          Tem um Terreno que Cumpre os Nossos Requisitos?
+          Aprovou o projeto mas decidiu não construir?
         </h2>
 
         <p className="mt-5 text-base sm:text-lg text-[#D6D3D1] max-w-2xl mx-auto leading-relaxed">
-          Proprietários e mediadores: não deixe o seu projeto parado no papel. Fale diretamente com quem tem capital próprio pronto para avançar com CPCV e escritura célere.
+          Não deixe o projeto caducar nem o terreno parado. Vendemos a solução: compramos diretamente com capital próprio, assinamos CPCV este mês e tratamos da escritura sem complicações.
         </p>
 
         {/* Big Final Main CTA Button */}
         <div className="mt-10 max-w-xl mx-auto space-y-4">
           <button
-            onClick={handleFinalWhatsApp}
-            className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white py-5 px-8 rounded-2xl font-black text-lg sm:text-xl shadow-2xl hover:shadow-[0_0_40px_rgba(37,211,102,0.4)] hover:-translate-y-1 transition-all duration-300 active:translate-y-0"
+            id="footer-form-cta"
+            onClick={scrollToLeadForm}
+            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-[#B45309] to-[#D97706] text-white py-5 px-8 rounded-2xl font-black text-lg sm:text-xl shadow-2xl hover:shadow-[0_0_40px_rgba(217,119,6,0.45)] hover:-translate-y-1 transition-all duration-300 active:translate-y-0"
           >
-            <MessageCircle className="w-7 h-7 fill-white shrink-0" />
-            <span>📲 Tenho o Terreno Ideal. Quero Enviar o Projeto.</span>
+            <span>Quero vender com CPCV este mês</span>
+            <ArrowRight className="w-6 h-6 shrink-0" />
           </button>
 
-          <div className="flex items-center justify-center gap-4 text-xs text-[#A8A29E]">
+          <button
+            id="footer-whatsapp"
+            onClick={handleFinalWhatsApp}
+            className="inline-flex items-center justify-center gap-2 text-sm text-[#D6D3D1] hover:text-white transition-colors"
+          >
+            <MessageCircle className="w-4 h-4 text-[#25D366]" /> Prefere WhatsApp? Fale connosco
+          </button>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-[#A8A29E]">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
-              Confidencialidade Rigorosa
+              Confidencial
             </span>
             <span>•</span>
-            <span>Resposta em 48 Horas</span>
+            <span>Resposta em 48 horas</span>
             <span>•</span>
-            <span>Zero Comissões (0%)</span>
+            <span>0% comissão para o proprietário</span>
           </div>
         </div>
 
@@ -98,7 +107,7 @@ export default function FinalCTA() {
               className="text-[#78716C] hover:text-white transition-colors flex items-center gap-1.5"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>Área Reservada (André)</span>
+              <span>Área Reservada</span>
             </Link>
 
             <button

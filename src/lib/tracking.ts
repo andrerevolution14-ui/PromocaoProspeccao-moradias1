@@ -1,122 +1,142 @@
 import { getWhatsAppUrl } from "./config";
-import { extractHighestValue, generateEventId, getCookie, getFbcParam } from "./tracking-utils";
+import { generateEventId, getCookie, getFbcParam } from "./tracking-utils";
 
-export interface TrackLeadParams {
+/**
+ * Estratégia de tracking:
+ * - "Lead"    → só quando o formulário é submetido (nome + telemóvel). É este o evento
+ *               para otimizar as campanhas Meta (Pixel + CAPI com o mesmo eventID).
+ * - "Contact" → clique num botão de WhatsApp. Útil para medir, mas NÃO é lead, para não
+ *               ensinar o algoritmo a trazer curiosos baratos.
+ * - "LeadFormStep" (custom) → progresso no formulário, para diagnosticar abandono.
+ */
+
+export type MetaEventName = "Lead" | "Contact";
+
+export interface LeadFormPayload {
   ctaOrigin: string;
-  role?: string;
-  location?: string;
-  askingPrice?: string;
+  location: string;
+  projectStatus: string;
+  area: string;
+  name: string;
+  phone: string;
+  role: string;
+}
+
+export interface TrackContactParams {
+  ctaOrigin: string;
   customMessage?: string;
-  notes?: string;
-  phone?: string;
-  email?: string;
-  name?: string;
+}
+
+function fbq(...args: unknown[]): void {
+  if (typeof window === "undefined") return;
+  const fn = (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq;
+  if (typeof fn !== "function") return;
+  try {
+    fn(...args);
+  } catch (err) {
+    console.warn("Erro Meta Pixel:", err);
+  }
+}
+
+function attributionData() {
+  return {
+    fbp: getCookie("_fbp") || undefined,
+    fbc: getFbcParam() || undefined,
+    pageUrl: typeof window !== "undefined" ? window.location.href : "",
+    referrer:
+      typeof window !== "undefined" ? window.document.referrer || window.location.href : ""
+  };
+}
+
+/** Regista progresso no formulário (evento custom, não afeta a otimização). */
+export function trackFormStep(step: number, stepName: string): void {
+  fbq("trackCustom", "LeadFormStep", { step, step_name: stepName });
 }
 
 /**
- * Dispara o evento Lead no Meta Pixel (lado do cliente) e envia para a API de Conversões (lado do servidor).
- * Usa o valor monetário mais alto preenchido e garante desduplicação através do mesmo eventID.
+ * Submete o formulário curto: grava no CRM, dispara "Lead" no Pixel e na CAPI (desduplicado).
+ * Devolve true se o servidor gravou a lead.
  */
-export function trackMetaLead(params: {
-  eventId: string;
-  value: number;
-  currency?: string;
-  contentName?: string;
-}): void {
-  if (typeof window !== "undefined" && typeof (window as any).fbq === "function") {
-    try {
-      const eventData: Record<string, any> = {
-        currency: params.currency || "EUR"
-      };
+export async function submitLeadForm(data: LeadFormPayload): Promise<boolean> {
+  const eventId = generateEventId();
+  const contentName = `${data.projectStatus} - ${data.location}`;
 
-      if (params.value > 0) {
-        eventData.value = params.value;
-      }
-      if (params.contentName) {
-        eventData.content_name = params.contentName;
-      }
+  fbq(
+    "track",
+    "Lead",
+    { content_name: contentName, content_category: data.projectStatus },
+    { eventID: eventId }
+  );
 
-      (window as any).fbq("track", "Lead", eventData, { eventID: params.eventId });
-    } catch (pixelErr) {
-      console.warn("Erro ao registar Meta Pixel Lead:", pixelErr);
-    }
+  const message = `Formulário: ${data.location} | Projeto: ${data.projectStatus} | Área: ${data.area}`;
+
+  try {
+    const res = await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        eventType: "Lead",
+        eventId,
+        ctaOrigin: data.ctaOrigin,
+        role: data.role,
+        location: data.location,
+        projectStatus: data.projectStatus,
+        area: data.area,
+        name: data.name,
+        phone: data.phone,
+        message,
+        ...attributionData()
+      })
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn("Erro ao submeter lead:", err);
+    return false;
   }
 }
 
 /**
- * Regista o evento de lead no backend, dispara o Meta Pixel & CAPI com o valor mais alto e abre o WhatsApp
+ * Clique de WhatsApp (alternativa secundária): dispara "Contact" e abre a conversa.
  */
-export async function trackAndOpenWhatsApp(params: TrackLeadParams): Promise<void> {
-  const url = getWhatsAppUrl({
-    customMessage: params.customMessage,
-    role: params.role,
-    location: params.location,
-    askingPrice: params.askingPrice
-  });
-
-  // 1. Extração do valor mais alto do formulário / inputs
-  const highestValue = extractHighestValue([
-    params.askingPrice,
-    params.customMessage,
-    params.notes
-  ]);
-
-  // 2. Identificador único de evento para desduplicação Pixel + CAPI
+export function trackAndOpenWhatsApp(params: TrackContactParams): void {
+  const url = getWhatsAppUrl({ customMessage: params.customMessage });
   const eventId = generateEventId();
 
-  // 3. Disparo imediato no Meta Pixel (navegador)
-  trackMetaLead({
-    eventId,
-    value: highestValue,
-    currency: "EUR",
-    contentName: `${params.role || "Lead"} - ${params.location || "Aveiro"}`
-  });
+  fbq("track", "Contact", { content_name: params.ctaOrigin }, { eventID: eventId });
 
-  // 4. Parâmetros de atribuição Meta
-  const fbp = getCookie("_fbp") || undefined;
-  const fbc = getFbcParam() || undefined;
-  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
-  const referrer = typeof window !== "undefined" ? window.document.referrer || window.location.href : "";
-
-  // 5. Registo assíncrono não-bloqueante no servidor (/api/leads dispara CAPI)
   try {
-    const payload = {
+    const payload = JSON.stringify({
+      eventType: "Contact",
+      eventId,
       ctaOrigin: params.ctaOrigin,
-      role: params.role || "Não especificado",
-      location: params.location || "Região de Aveiro",
-      askingPrice: params.askingPrice || (highestValue > 0 ? `${highestValue} €` : ""),
-      message: params.customMessage || "Olá André, tenho um terreno com projeto aprovado em Aveiro. Gostaria de enviar os detalhes.",
-      referrer: referrer,
-      notes: params.notes || "",
-      phone: params.phone,
-      email: params.email,
-      name: params.name,
-      // Metadados Meta CAPI
-      eventId: eventId,
-      value: highestValue,
-      currency: "EUR",
-      fbp: fbp,
-      fbc: fbc,
-      pageUrl: pageUrl
-    };
-
+      message: params.customMessage || "Clique WhatsApp",
+      ...attributionData()
+    });
     if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-      navigator.sendBeacon("/api/leads", blob);
+      navigator.sendBeacon("/api/leads", new Blob([payload], { type: "application/json" }));
     } else {
       fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: payload,
         keepalive: true
-      }).catch((err) => console.warn("Erro ao registar lead em background:", err));
+      }).catch(() => {});
     }
   } catch (err) {
-    console.warn("Tracking lead error:", err);
+    console.warn("Tracking contact error:", err);
   }
 
-  // 6. Abrir WhatsApp imediatamente
   if (typeof window !== "undefined") {
     window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
+/** Faz scroll até ao formulário principal e foca o primeiro campo. */
+export function scrollToLeadForm(): void {
+  if (typeof document === "undefined") return;
+  const el = document.getElementById("avaliar");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }

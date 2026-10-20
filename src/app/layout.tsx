@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Compramos Terrenos com Projeto em Aveiro | Grupo Freitas Renovações",
   description:
-    "Compramos diretamente terrenos com projeto de arquitetura aprovado ou PIP num raio de 15 km de Aveiro. Decisão em 48h, CPCV imediato e zero comissões imobiliárias.",
+    "Tem um terreno com projeto aprovado ou PIP em Aveiro? Diga-nos e respondemos em 48h. Compra direta pelo construtor, sem comissões para o proprietário.",
   keywords: [
     "terrenos aveiro",
     "comprar terreno com projeto aveiro",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Compramos Terrenos com Projeto Aprovado em Aveiro | Grupo Freitas",
     description:
-      "Avaliação em 48 horas. Venda direta, dinheiro rápido e zero comissões de imobiliárias. Raio 15km de Aveiro.",
+      "Diga-nos onde fica o terreno e respondemos em 48 horas. Venda direta, sem comissões para o proprietário. Raio 15km de Aveiro.",
     url: "https://grupofreitasrenovacoes.pt",
     siteName: "Grupo Freitas Renovações",
     locale: "pt_PT",

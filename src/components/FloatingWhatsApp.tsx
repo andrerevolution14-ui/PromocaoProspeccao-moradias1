@@ -1,74 +1,55 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MessageCircle, X } from "lucide-react";
-import { trackAndOpenWhatsApp } from "@/lib/tracking";
+import { MessageCircle, ArrowUp } from "lucide-react";
+import { scrollToLeadForm, trackAndOpenWhatsApp } from "@/lib/tracking";
 
+/**
+ * CTA fixo: aparece depois de o utilizador passar o formulário do topo.
+ * Ação principal = voltar ao formulário (evento Lead). WhatsApp = alternativa secundária.
+ */
 export default function FloatingWhatsApp() {
   const [visible, setVisible] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // Mostrar após 300px de scroll ou após 2 segundos
     const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setVisible(true);
-      }
+      const form = document.getElementById("avaliar");
+      const threshold = form ? form.getBoundingClientRect().bottom + window.scrollY : 700;
+      setVisible(window.scrollY + 80 > threshold);
     };
-
-    const timer = setTimeout(() => {
-      setVisible(true);
-    }, 2000);
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      clearTimeout(timer);
-    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleClick = () => {
+  const handleWhatsApp = () => {
     trackAndOpenWhatsApp({
       ctaOrigin: "Botão Flutuante WhatsApp",
-      customMessage: "Olá André, vi o vosso anúncio sobre compra de terrenos em Aveiro. Gostaria de falar consigo no WhatsApp."
+      customMessage: "Olá, vi a vossa página sobre compra de terrenos em Aveiro e gostava de falar sobre um terreno."
     });
   };
 
-  if (dismissed || !visible) return null;
+  if (!visible) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-40 flex items-center gap-2 group animate-in fade-in slide-in-from-bottom-5 duration-300">
-      
-      {/* Speech bubble hint */}
-      <div className="hidden md:flex items-center bg-[#1C1917] text-white text-xs font-bold py-2 px-3.5 rounded-2xl shadow-xl border border-[#44403C]">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#25D366] animate-ping" />
-          <span>André online • Resposta em 48h</span>
-        </div>
-      </div>
-
-      {/* Main Sticky WhatsApp Pill */}
+    <div className="fixed inset-x-3 bottom-3 sm:inset-x-auto sm:right-7 sm:bottom-7 z-40 flex items-center gap-2 lf-fade">
       <button
-        onClick={handleClick}
-        className="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20BD5A] text-white py-3.5 px-5 sm:py-4 sm:px-6 rounded-full font-extrabold text-sm sm:text-base shadow-2xl hover:shadow-[0_10px_30px_rgba(37,211,102,0.5)] transition-all duration-300 hover:scale-105 active:scale-95"
-        aria-label="Falar com o André no WhatsApp"
+        id="floating-form-cta"
+        onClick={scrollToLeadForm}
+        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#B45309] to-[#D97706] text-white py-3.5 px-6 rounded-full font-extrabold text-sm sm:text-base shadow-2xl hover:shadow-[0_10px_30px_rgba(217,119,6,0.5)] hover:scale-[1.03] active:scale-95 transition-all"
       >
-        <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 fill-white shrink-0 animate-bounce" />
-        <span className="whitespace-nowrap">Falar com o André</span>
+        <ArrowUp className="w-4 h-4" />
+        Vender rápido sem complicações
       </button>
-
-      {/* Dismiss Button */}
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setDismissed(true);
-        }}
-        className="w-6 h-6 rounded-full bg-black/40 text-white/70 hover:text-white flex items-center justify-center text-xs transition-opacity"
-        title="Ocultar botão"
+        id="floating-whatsapp"
+        onClick={handleWhatsApp}
+        aria-label="Falar no WhatsApp"
+        title="Falar no WhatsApp"
+        className="w-12 h-12 sm:w-13 sm:h-13 shrink-0 inline-flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl hover:scale-105 active:scale-95 transition-transform"
       >
-        <X className="w-3.5 h-3.5" />
+        <MessageCircle className="w-6 h-6 fill-white" />
       </button>
-
     </div>
   );
 }

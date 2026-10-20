@@ -158,6 +158,8 @@ export default function DashboardPage() {
       lead.role?.toLowerCase().includes(q) ||
       lead.message?.toLowerCase().includes(q) ||
       lead.notes?.toLowerCase().includes(q) ||
+      lead.name?.toLowerCase().includes(q) ||
+      lead.phone?.toLowerCase().includes(q) ||
       lead.ctaOrigin?.toLowerCase().includes(q);
     return matchesStatus && matchesSearch;
   });
@@ -386,9 +388,9 @@ export default function DashboardPage() {
                 <tr className="bg-[#FAF8F5] border-b border-[#E7DFD5] text-[#78716C] text-[11px] font-bold uppercase tracking-wider">
                   <th className="py-3.5 px-4">Data / Hora</th>
                   <th className="py-3.5 px-4">Origem & Gatilho</th>
-                  <th className="py-3.5 px-4">Perfil & Localização</th>
-                  <th className="py-3.5 px-4">Preço Pretendido</th>
-                  <th className="py-3.5 px-4">Mensagem Enviada WhatsApp</th>
+                  <th className="py-3.5 px-4">Contacto & Localização</th>
+                  <th className="py-3.5 px-4">Projeto / Área</th>
+                  <th className="py-3.5 px-4">Mensagem / Detalhe</th>
                   <th className="py-3.5 px-4">Estado</th>
                   <th className="py-3.5 px-4">Notas do André</th>
                   <th className="py-3.5 px-4 text-right">Ações</th>
@@ -447,23 +449,56 @@ export default function DashboardPage() {
 
                         {/* Perfil & Local */}
                         <td className="py-3.5 px-4">
-                          <div className="font-bold text-[#1C1917]">
+                          {lead.name && (
+                            <div className="font-extrabold text-[#1C1917]">{lead.name}</div>
+                          )}
+                          {lead.phone && (
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <a href={`tel:${lead.phone.replace(/\s/g, "")}`} className="text-xs font-bold text-[#1C1917] hover:text-[#B45309] underline">
+                                {lead.phone}
+                              </a>
+                              <a
+                                href={`https://wa.me/${(() => { const d = lead.phone.replace(/\D/g, ""); return d.length === 9 ? `351${d}` : d; })()}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] font-bold text-white bg-[#25D366] px-1.5 py-0.5 rounded"
+                              >
+                                WA
+                              </a>
+                            </div>
+                          )}
+                          <div className={`text-xs ${lead.name ? "text-[#78716C]" : "font-bold text-[#1C1917]"} mt-0.5`}>
                             {lead.role || "Não especificado"}
                           </div>
-                          <div className="text-xs text-[#B45309] font-semibold flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3 h-3 shrink-0" />
-                            <span>{lead.location || "Região Aveiro"}</span>
-                          </div>
+                          {lead.location && (
+                            <div className="text-xs text-[#B45309] font-semibold flex items-center gap-1 mt-0.5">
+                              <MapPin className="w-3 h-3 shrink-0" />
+                              <span>{lead.location}</span>
+                            </div>
+                          )}
                         </td>
 
-                        {/* Valor Pretendido */}
+                        {/* Projeto / Área (ou valor em leads antigas) */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          {lead.askingPrice ? (
+                          {lead.projectStatus ? (
+                            <div className="space-y-1">
+                              <span className={`inline-block font-bold text-xs px-2 py-1 rounded-md ${
+                                lead.projectStatus === "Aprovado"
+                                  ? "bg-[#DCFCE7] text-[#15803D]"
+                                  : lead.projectStatus === "Não"
+                                    ? "bg-[#FEE2E2] text-[#B91C1C]"
+                                    : "bg-[#FEF3C7] text-[#B45309]"
+                              }`}>
+                                {lead.projectStatus}
+                              </span>
+                              {lead.area && <div className="text-[11px] text-[#78716C]">{lead.area}</div>}
+                            </div>
+                          ) : lead.askingPrice ? (
                             <span className="font-bold text-[#1C1917] bg-[#F5EFEB] px-2 py-1 rounded-md">
                               {lead.askingPrice}
                             </span>
                           ) : (
-                            <span className="text-xs text-[#A8A29E]">Sob Consulta</span>
+                            <span className="text-xs text-[#A8A29E]">—</span>
                           )}
                         </td>
 

@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { SITE_CONFIG } from "./config";
 
 export interface MetaCapiLeadParams {
+  eventName?: "Lead" | "Contact";
   eventId: string;
   value?: number;
   currency?: string;
@@ -82,6 +83,9 @@ export async function sendMetaConversionsApiEvent(
     const hashedFn = hashData(params.firstName);
     if (hashedFn) userData.fn = [hashedFn];
 
+    // País (Portugal) melhora a taxa de correspondência
+    userData.country = [hashData("pt")];
+
     // Dados customizados (valor monetário mais alto)
     const customData: Record<string, any> = {
       currency: params.currency || "EUR"
@@ -95,7 +99,7 @@ export async function sendMetaConversionsApiEvent(
     }
 
     const eventPayload: Record<string, any> = {
-      event_name: "Lead",
+      event_name: params.eventName || "Lead",
       event_time: eventTime,
       event_id: params.eventId,
       action_source: "website",

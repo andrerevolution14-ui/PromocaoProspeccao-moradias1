@@ -1,133 +1,105 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
-import { MessageCircle, Clock, ShieldCheck, Banknote, Sparkles, MapPin, CheckCircle2 } from "lucide-react";
+import { MessageCircle, Clock, Banknote, MapPin, CheckCircle2, ShieldCheck } from "lucide-react";
 import { trackAndOpenWhatsApp } from "@/lib/tracking";
 import { SITE_CONFIG } from "@/lib/config";
-import LeadModal from "@/components/LeadModal";
+import LeadForm from "@/components/LeadForm";
+import GoogleRatingBadge from "@/components/GoogleRatingBadge";
 
 export default function Hero() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleMainCTA = () => {
+  const handleWhatsApp = () => {
     trackAndOpenWhatsApp({
-      ctaOrigin: "Hero Main CTA",
+      ctaOrigin: "Hero (WhatsApp secundário)",
       customMessage: SITE_CONFIG.defaultWhatsAppMessage
     });
   };
 
   return (
-    <section className="relative overflow-hidden pt-8 pb-16 md:pt-14 md:pb-20 bg-gradient-to-b from-[#FDFBF7] via-[#F8F4EE] to-[#F3ECE1]">
-      
+    <section className="relative overflow-hidden pt-8 pb-14 md:pt-14 md:pb-20 bg-gradient-to-b from-[#FDFBF7] via-[#F8F4EE] to-[#F3ECE1]">
       {/* Background Decorative Grid */}
       <div className="absolute inset-0 bg-[radial-gradient(#D4C7B5_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
+      <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full bg-[#F59E0B]/10 blur-[100px] pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Top Badges: Pre-title & 3 Terrenos Comprados */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#B45309]/10 border border-[#B45309]/20 text-[#B45309] text-xs sm:text-sm font-bold tracking-wider uppercase shadow-xs">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>INVESTIDORES / CONSTRUTORES COMPRAM DIRETAMENTE</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Coluna esquerda — mensagem */}
+          <div className="lg:col-span-6 text-center lg:text-left">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-5">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1C1917] text-white text-xs font-bold shadow-xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
+                <span>+3 terrenos comprados último mês</span>
+              </div>
+              <GoogleRatingBadge />
+            </div>
+
+            <h1 className="text-[2.1rem] sm:text-5xl lg:text-[3.25rem] font-black tracking-tight text-[#1C1917] leading-[1.08]">
+              Aprovou o projeto mas não vai construir?{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B45309] via-[#D97706] to-[#92400E]">
+                Compramos já, com CPCV este mês.
+              </span>
+            </h1>
+
+            <p className="mt-4 text-lg sm:text-2xl font-bold text-[#44403C]">
+              Precisa de vender rápido e sem complicações em Aveiro?
+            </p>
+
+            <p className="mt-3 text-base text-[#57534E] leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Somos construtores com <strong>capital próprio disponível</strong>. Sem visitas intermináveis, sem intermediários e com <strong>0% de comissões</strong> para o proprietário. Diga-nos onde fica e receba proposta formal em 48h.
+            </p>
+
+            {/* Trust points */}
+            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-xl mx-auto lg:mx-0 text-left">
+              {[
+                { icon: Clock, title: "Resposta em 48h", color: "bg-[#FEF3C7] text-[#B45309]" },
+                { icon: Banknote, title: "0% comissão para o proprietário", color: "bg-[#DCFCE7] text-[#15803D]" },
+                { icon: MapPin, title: "Aveiro e raio de 15 km", color: "bg-[#FFEDD5] text-[#C2410C]" }
+              ].map(({ icon: Icon, title, color }) => (
+                <li
+                  key={title}
+                  className="flex items-center gap-2.5 bg-white/80 backdrop-blur-sm border border-[#E7DFD5] rounded-xl px-3 py-2.5 shadow-xs"
+                >
+                  <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${color}`}>
+                    <Icon className="w-4 h-4" />
+                  </span>
+                  <span className="text-xs font-bold text-[#1C1917] leading-snug">{title}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1C1917] text-white text-xs font-bold shadow-xs">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
-            <span>+3 Terrenos com Projeto Comprados nos Últimos 6 Meses</span>
-          </div>
-        </div>
-
-        {/* Main Title & Subtitle */}
-        <div className="text-center max-w-4xl mx-auto space-y-4">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#1C1917] leading-[1.12]">
-            Tem um Terreno com Projeto em Aveiro?{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B45309] via-[#D97706] to-[#92400E]">
-              Compramos, Assinamos CPCV e Escrituramos Rápido.
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-xl text-[#57534E] leading-relaxed max-w-3xl mx-auto font-normal">
-            Procuramos terrenos com <strong>projeto aprovado (ou PIP)</strong> em <strong>Aveiro Centro e freguesias num raio de 10 a 15 km</strong> (Santa Joana, Esgueira, Aradas, Oliveirinha, Ílhavo, Cacia e arredores). Avaliamos a viabilidade em <strong>48 horas</strong>. Venda direta, dinheiro rápido e <strong>zero comissões de imobiliárias</strong>.
-          </p>
-        </div>
-
-        {/* Main Single CTA Button - Limpo, Direto e de Alta Conversão */}
-        <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-2.5 max-w-md mx-auto">
-          <button
-            onClick={handleMainCTA}
-            className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white py-4.5 sm:py-5 px-8 rounded-2xl font-black text-lg sm:text-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
-          >
-            <MessageCircle className="w-6 h-6 fill-white shrink-0" />
-            <span>Falar com o André no WhatsApp</span>
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="text-xs sm:text-sm font-bold text-[#B45309] hover:text-[#92400E] underline decoration-[#D4C7B5] py-1 transition-colors"
-          >
-            📋 Ou preencher formulário rápido do terreno (48h)
-          </button>
-
-          <p className="text-xs text-center text-[#78716C] font-semibold">
-            ⚡ Resposta direta pelo construtor em menos de 48 horas
-          </p>
-        </div>
-
-        {/* Modal de Lead */}
-        <LeadModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          ctaOrigin="Hero Formulário Análise 48h"
-        />
-
-        {/* 4 Trust Value Badges */}
-        <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
-          <div className="bg-white/90 backdrop-blur-sm border border-[#E7DFD5] rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] text-[#B45309] flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
+          {/* Coluna direita — formulário */}
+          <div className="lg:col-span-6">
+            <div
+              id="avaliar"
+              className="scroll-mt-28 relative bg-white rounded-3xl border border-[#E7DFD5] shadow-[0_20px_60px_-15px_rgba(120,53,15,0.25)] p-5 sm:p-7"
+            >
+              <div className="absolute -top-3 left-6 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#B45309] to-[#D97706] px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-md">
+                <ShieldCheck className="w-3.5 h-3.5" /> 30 segundos • sem compromisso
+              </div>
+              <div className="pt-2">
+                <LeadForm ctaOrigin="Hero Formulário" />
+              </div>
             </div>
-            <div>
-              <div className="text-xs font-bold uppercase text-[#78716C] tracking-wide">Decisão Rápida</div>
-              <div className="text-sm font-extrabold text-[#1C1917]">Resposta em 48 Horas</div>
-            </div>
-          </div>
 
-          <div className="bg-white/90 backdrop-blur-sm border border-[#E7DFD5] rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center shrink-0">
-              <Banknote className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs font-bold uppercase text-[#78716C] tracking-wide">Sem Intermediários</div>
-              <div className="text-sm font-extrabold text-[#1C1917]">Zero Comissões (0%)</div>
-            </div>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-sm border border-[#E7DFD5] rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-[#E0E7FF] text-[#4338CA] flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs font-bold uppercase text-[#78716C] tracking-wide">Solidez Financeira</div>
-              <div className="text-sm font-extrabold text-[#1C1917]">Capital Próprio Garantido</div>
-            </div>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-sm border border-[#E7DFD5] rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-[#FFEDD5] text-[#C2410C] flex items-center justify-center shrink-0">
-              <MapPin className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs font-bold uppercase text-[#78716C] tracking-wide">Foco Regional</div>
-              <div className="text-sm font-extrabold text-[#1C1917]">Aveiro e Raio 15km</div>
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                id="hero-whatsapp"
+                onClick={handleWhatsApp}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[#57534E] hover:text-[#15803D] transition-colors"
+              >
+                <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                Prefere WhatsApp? <span className="underline decoration-[#D4C7B5] underline-offset-2">Fale connosco</span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Hero Visual Banner (Plot of land with approved project overlay) */}
-        <div className="mt-10 sm:mt-12 relative rounded-3xl overflow-hidden border border-[#D4C7B5] shadow-2xl bg-[#1C1917]">
-          <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full">
+        {/* Hero Visual Banner */}
+        <div className="mt-12 sm:mt-16 relative rounded-3xl overflow-hidden border border-[#D4C7B5] shadow-2xl bg-[#1C1917]">
+          <div className="relative aspect-[16/9] sm:aspect-[21/8] w-full">
             <Image
               src="/images/hero-terreno.jpg"
               alt="Terreno com projeto aprovado em Aveiro - Compra direta Grupo Freitas"
@@ -136,24 +108,18 @@ export default function Hero() {
               className="object-cover"
               sizes="(max-width: 1280px) 100vw, 1280px"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
-            
-            {/* Live Floating Badge over Hero Image */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-auto max-w-md bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/40 shadow-xl">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#B45309]">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-ping" />
-                Compra Ativa neste momento
+                A comprar neste momento
               </div>
               <div className="text-sm sm:text-base font-extrabold text-[#1C1917] mt-1">
                 Aveiro Centro • Santa Joana • Esgueira • Cacia • Aradas • Oliveirinha • Ílhavo
               </div>
-              <div className="text-xs text-[#78716C] mt-1">
-                Mais de 3 terrenos adquiridos nos últimos 6 meses. Capital próprio disponível para fechar CPCV este mês.
-              </div>
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );

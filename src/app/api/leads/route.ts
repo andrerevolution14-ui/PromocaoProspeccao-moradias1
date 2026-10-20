@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getLeads, saveLead } from "@/lib/leads-store";
 import { sendMetaConversionsApiEvent } from "@/lib/meta-capi";
-import { extractHighestValue } from "@/lib/tracking-utils";
 
 export async function GET() {
   try {
@@ -12,7 +11,10 @@ export async function GET() {
     const sevenDaysAgo = now.getTime() - 7 * 24 * 60 * 60 * 1000;
 
     const totalLeads = leads.length;
-    const leadsLandingPage = leads.filter((l) => l.source === "Landing Page").length;
+    // Leads reais = formulários submetidos (inclui registos antigos "Landing Page")
+    const leadsLandingPage = leads.filter(
+      (l) => l.source === "Formulário" || l.source === "Landing Page"
+    ).length;
     const leadsToday = leads.filter((l) => new Date(l.timestamp).getTime() >= todayStart).length;
     const leadsWeek = leads.filter((l) => new Date(l.timestamp).getTime() >= sevenDaysAgo).length;
 
@@ -62,56 +64,67 @@ export async function POST(request: Request) {
 
     const referrer = body.referrer || request.headers.get("referer") || "Acesso Direto";
 
-    // 1. Extração do valor mais alto do formulário
-    const leadValue =
-      typeof body.value === "number" && body.value > 0
-        ? body.value
-        : extractHighestValue([body.askingPrice, body.message, body.notes]);
+    const eventType: "Lead" | "Contact" = body.eventType === "Contact" ? "Contact" : "Lead";
+    const isForm = eventType === "Lead";
 
-    // 2. Event ID para desduplicação Pixel + CAPI
+    // Validação mínima: uma lead de formulário tem de trazer telemóvel
+    const phone = typeof body.phone === "string" ? body.phone.trim().slice(0, 30) : "";
+    const name = typeof body.name === "string" ? body.name.trim().slice(0, 120) : "";
+    if (isForm && phone.replace(/\D/g, "").length < 9) {
+      return NextResponse.json({ success: false, error: "Telemóvel inválido" }, { status: 400 });
+    }
+
+    // 1. Event ID para desduplicação Pixel + CAPI
     const eventId =
       body.eventId || `lead_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // 3. Gravar lead no CRM / Base de Dados
+    // 2. Gravar no CRM / Base de Dados
     const newLead = await saveLead({
-      source: "Landing Page",
-      ctaOrigin: body.ctaOrigin || "Botão Geral WhatsApp",
+      source: isForm ? "Formulário" : "Clique WhatsApp",
+      ctaOrigin: body.ctaOrigin || (isForm ? "Formulário" : "Botão WhatsApp"),
       role: body.role || "Não especificado",
-      location: body.location || "Região de Aveiro",
-      askingPrice: body.askingPrice || (leadValue > 0 ? `${leadValue} €` : ""),
-      message: body.message || "Clique para WhatsApp",
+      location: body.location || "",
+      askingPrice: body.askingPrice || "",
+      message: body.message || (isForm ? "Formulário submetido" : "Clique para WhatsApp"),
       referrer: referrer,
       device: device,
       userAgent: userAgent,
       status: "Novo",
-      notes: body.notes || ""
+      notes: body.notes || "",
+      name: name || undefined,
+      phone: phone || undefined,
+      projectStatus: body.projectStatus || undefined,
+      area: body.area || undefined
     });
 
-    // 4. Envio assíncrono para a Meta Conversions API (CAPI)
-    sendMetaConversionsApiEvent({
+    // 3. Envio para a Meta Conversions API (CAPI) — Lead só para formulários
+    const firstName = name.split(/\s+/)[0] || undefined;
+    const capiPromise = sendMetaConversionsApiEvent({
+      eventName: eventType,
       eventId: eventId,
-      value: leadValue,
-      currency: "EUR",
-      contentName: `${body.role || "Lead"} - ${body.location || "Aveiro"}`,
+      contentName: isForm
+        ? `${body.projectStatus || "Projeto"} - ${body.location || "Aveiro"}`
+        : body.ctaOrigin || "WhatsApp",
       sourceUrl: body.pageUrl || referrer,
       userAgent: userAgent,
       ipAddress: ipAddress,
       fbp: body.fbp,
       fbc: body.fbc,
-      phone: body.phone,
-      email: body.email,
-      firstName: body.name
-    }).catch((err) => console.warn("Meta CAPI background error:", err));
+      phone: phone || undefined,
+      firstName
+    }).catch((err) => {
+      console.warn("Meta CAPI background error:", err);
+      return null;
+    });
+
+    // Em serverless o processo pode terminar antes do envio: aguardamos nas leads reais
+    if (isForm) await capiPromise;
 
     return NextResponse.json(
       {
         success: true,
-        lead: newLead,
-        metaTracking: {
-          eventId: eventId,
-          value: leadValue,
-          currency: "EUR"
-        }
+        lead: { id: newLead.id },
+        metaTracking: { eventId, eventType }
       },
       { status: 201 }
     );

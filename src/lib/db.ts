@@ -30,6 +30,11 @@ export async function initDb() {
         notes TEXT
       );
     `;
+    // Migração: colunas de contacto e qualificação do formulário curto
+    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS name VARCHAR(150);`;
+    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS phone VARCHAR(50);`;
+    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS project_status VARCHAR(100);`;
+    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS area VARCHAR(50);`;
     console.log("Tabela leads inicializada com sucesso no Neon PostgreSQL.");
   } catch (err) {
     console.error("Erro ao inicializar tabela leads no Neon:", err);
@@ -57,7 +62,11 @@ export async function getDbLeads(): Promise<Lead[]> {
         device, 
         user_agent as "userAgent", 
         status, 
-        notes 
+        notes,
+        name,
+        phone,
+        project_status as "projectStatus",
+        area
       FROM leads 
       ORDER BY timestamp DESC;
     `;
@@ -77,7 +86,8 @@ export async function insertDbLead(lead: Lead): Promise<boolean> {
     await initDb();
     await sql`
       INSERT INTO leads (
-        id, timestamp, source, cta_origin, role, location, asking_price, message, referrer, device, user_agent, status, notes
+        id, timestamp, source, cta_origin, role, location, asking_price, message, referrer, device, user_agent, status, notes,
+        name, phone, project_status, area
       ) VALUES (
         ${lead.id}, 
         ${lead.timestamp}, 
@@ -91,7 +101,11 @@ export async function insertDbLead(lead: Lead): Promise<boolean> {
         ${lead.device || null}, 
         ${lead.userAgent || null}, 
         ${lead.status || "Novo"}, 
-        ${lead.notes || null}
+        ${lead.notes || null},
+        ${lead.name || null},
+        ${lead.phone || null},
+        ${lead.projectStatus || null},
+        ${lead.area || null}
       );
     `;
     return true;

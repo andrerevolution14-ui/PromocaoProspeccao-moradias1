@@ -1,10 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { ShieldCheck, Award, ExternalLink, CheckCircle2, Eye, ChevronRight } from "lucide-react";
+import { ShieldCheck, Award, ExternalLink, Eye, ChevronRight, Star } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/config";
+import GoogleRatingBadge from "@/components/GoogleRatingBadge";
 
 export default function SocialProof() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { rating, reviews, profileUrl } = SITE_CONFIG.googleReviews;
+  const hasReviews = rating !== null && reviews.length > 0;
 
   // Apenas as fotografias REAIS das obras do Grupo Freitas (sem imagens geradas por IA)
   const realWorks = [
@@ -102,9 +106,6 @@ export default function SocialProof() {
                 <div className="text-xs text-[#78716C] mt-0.5">
                   Articulação técnica rigorosa com o PDM da Câmara Municipal de Aveiro
                 </div>
-                <div className="text-[11px] font-semibold text-[#15803D] mt-1 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> +3 terrenos adquiridos nos últimos 6 meses
-                </div>
               </div>
             </div>
 
@@ -125,6 +126,42 @@ export default function SocialProof() {
 
           </div>
         </div>
+
+        {/* Avaliações Google (reais) — só aparece quando configurado em SITE_CONFIG.googleReviews */}
+        {hasReviews && (
+          <div className="mb-14">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+              <div>
+                <h3 className="text-2xl font-black text-[#1C1917] tracking-tight">O que dizem os nossos clientes</h3>
+                <p className="text-sm text-[#78716C] mt-1">Avaliações públicas no Google.</p>
+              </div>
+              <GoogleRatingBadge />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {reviews.slice(0, 3).map((r) => (
+                <figure key={r.author} className="bg-white rounded-3xl p-6 border border-[#E7DFD5] shadow-sm hover:shadow-lg transition-shadow">
+                  <div className="flex mb-3">
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <Star key={i} className={`w-4 h-4 ${i < r.rating ? "fill-[#FBBC05] text-[#FBBC05]" : "text-[#D6D3D1]"}`} />
+                    ))}
+                  </div>
+                  <blockquote className="text-sm text-[#44403C] leading-relaxed">&ldquo;{r.text}&rdquo;</blockquote>
+                  <figcaption className="mt-4 text-xs font-bold text-[#1C1917]">
+                    {r.author}
+                    {r.when && <span className="font-normal text-[#A8A29E]"> • {r.when}</span>}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            {profileUrl && (
+              <div className="mt-5 text-center">
+                <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-bold text-[#B45309] hover:underline">
+                  Ver todas as avaliações no Google <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Gallery Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">

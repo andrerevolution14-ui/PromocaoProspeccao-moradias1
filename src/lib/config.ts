@@ -31,7 +31,7 @@ export const SITE_CONFIG = {
   contactPerson: "André",
   // Número WhatsApp: +351 920 601 070 (formato wa.me: 351920601070)
   whatsappNumber: getCleanWhatsAppNumber(),
-  defaultWhatsAppMessage: "Olá André, tenho um terreno com projeto em Aveiro. Gostaria de enviar os detalhes para análise.",
+  defaultWhatsAppMessage: "Olá, tenho um terreno com projeto em Aveiro e gostava de saber se vos interessa.",
   locations: [
     "Aveiro Centro (Glória e Vera Cruz)",
     "Santa Joana",
@@ -44,6 +44,33 @@ export const SITE_CONFIG = {
     "Gafanhas (Nazaré, Encarnação, Carmo)",
     "Outra zona num raio de 10 a 15 km de Aveiro"
   ],
+  // Opções do formulário curto (1 pergunta por ecrã)
+  projectStatusOptions: [
+    { value: "Aprovado", label: "Sim, projeto aprovado", hint: "Arquitetura aprovada na Câmara" },
+    { value: "PIP + Projeto não aprovado", label: "PIP + projeto não aprovado", hint: "Tem PIP e projeto entregue" },
+    { value: "Em curso", label: "Está em curso", hint: "Projeto a ser feito ou em apreciação" },
+    { value: "Não", label: "Ainda não tem projeto", hint: "Só o terreno" }
+  ],
+  areaOptions: [
+    "Menos de 300 m²",
+    "300 a 500 m²",
+    "500 a 800 m²",
+    "800 a 1.200 m²",
+    "Mais de 1.200 m²",
+    "Não sei"
+  ],
+  /**
+   * Avaliações Google — preencher com os dados REAIS do perfil Google Business.
+   * Enquanto `rating` for null, o bloco de avaliações não é mostrado na página.
+   */
+  googleReviews: {
+    rating: null as number | null, // ex: 4.9
+    count: null as number | null, // ex: 27
+    profileUrl: "", // link "Ver no Google" (Google Maps / Business Profile)
+    reviews: [] as { author: string; text: string; rating: number; when?: string }[]
+  },
+  // Comissão de referência para mediadores (texto livre; vazio = "comissão de referência" sem valor)
+  mediatorCommissionLabel: "",
   adminCredentials: {
     username: process.env.ADMIN_USERNAME || "andre",
     email: process.env.ADMIN_EMAIL || "andre@grupofreitasrenovacoes.pt",

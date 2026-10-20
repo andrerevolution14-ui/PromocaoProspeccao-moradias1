@@ -16,6 +16,10 @@ export interface Lead {
   userAgent?: string;
   status: "Novo" | "Em Análise" | "Contactado" | "CPCV Assinado" | "Desqualificado";
   notes?: string;
+  name?: string;
+  phone?: string;
+  projectStatus?: string; // "Aprovado" | "PIP + Projeto não aprovado" | "Em curso" | "Não"
+  area?: string;
 }
 
 const DATA_DIR = path.join(process.cwd(), "data");
