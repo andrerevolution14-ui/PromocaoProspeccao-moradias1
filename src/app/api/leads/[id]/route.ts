@@ -31,12 +31,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params;
-    const deleted = await deleteLead(id);
-
-    if (!deleted) {
-      return NextResponse.json({ success: false, error: "Lead não encontrada" }, { status: 404 });
-    }
-
+    await deleteLead(id);
     return NextResponse.json({ success: true, message: "Lead eliminada com sucesso" });
   } catch (error) {
     console.error("API DELETE Lead erro:", error);

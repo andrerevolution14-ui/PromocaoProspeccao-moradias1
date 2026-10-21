@@ -14,7 +14,7 @@ export async function initDb() {
   if (!sql) return;
   try {
     await sql`
-      CREATE TABLE IF NOT EXISTS leads (
+      CREATE TABLE IF NOT EXISTS terrenos_leads (
         id VARCHAR(100) PRIMARY KEY,
         timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         source VARCHAR(50) NOT NULL,
@@ -31,13 +31,13 @@ export async function initDb() {
       );
     `;
     // Migração: colunas de contacto e qualificação do formulário curto
-    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS name VARCHAR(150);`;
-    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS phone VARCHAR(50);`;
-    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS project_status VARCHAR(100);`;
-    await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS area VARCHAR(50);`;
-    console.log("Tabela leads inicializada com sucesso no Neon PostgreSQL.");
+    await sql`ALTER TABLE terrenos_leads ADD COLUMN IF NOT EXISTS name VARCHAR(150);`;
+    await sql`ALTER TABLE terrenos_leads ADD COLUMN IF NOT EXISTS phone VARCHAR(50);`;
+    await sql`ALTER TABLE terrenos_leads ADD COLUMN IF NOT EXISTS project_status VARCHAR(100);`;
+    await sql`ALTER TABLE terrenos_leads ADD COLUMN IF NOT EXISTS area VARCHAR(50);`;
+    console.log("Tabela terrenos_leads inicializada com sucesso no Neon PostgreSQL.");
   } catch (err) {
-    console.error("Erro ao inicializar tabela leads no Neon:", err);
+    console.error("Erro ao inicializar tabela terrenos_leads no Neon:", err);
   }
 }
 
@@ -67,7 +67,7 @@ export async function getDbLeads(): Promise<Lead[]> {
         phone,
         project_status as "projectStatus",
         area
-      FROM leads 
+      FROM terrenos_leads 
       ORDER BY timestamp DESC;
     `;
     return rows as unknown as Lead[];
@@ -85,7 +85,7 @@ export async function insertDbLead(lead: Lead): Promise<boolean> {
   try {
     await initDb();
     await sql`
-      INSERT INTO leads (
+      INSERT INTO terrenos_leads (
         id, timestamp, source, cta_origin, role, location, asking_price, message, referrer, device, user_agent, status, notes,
         name, phone, project_status, area
       ) VALUES (
@@ -122,11 +122,11 @@ export async function updateDbLead(id: string, updates: { status?: string; notes
   if (!sql) return false;
   try {
     if (updates.status && updates.notes !== undefined) {
-      await sql`UPDATE leads SET status = ${updates.status}, notes = ${updates.notes} WHERE id = ${id};`;
+      await sql`UPDATE terrenos_leads SET status = ${updates.status}, notes = ${updates.notes} WHERE id = ${id};`;
     } else if (updates.status) {
-      await sql`UPDATE leads SET status = ${updates.status} WHERE id = ${id};`;
+      await sql`UPDATE terrenos_leads SET status = ${updates.status} WHERE id = ${id};`;
     } else if (updates.notes !== undefined) {
-      await sql`UPDATE leads SET notes = ${updates.notes} WHERE id = ${id};`;
+      await sql`UPDATE terrenos_leads SET notes = ${updates.notes} WHERE id = ${id};`;
     }
     return true;
   } catch (err) {
@@ -141,7 +141,7 @@ export async function updateDbLead(id: string, updates: { status?: string; notes
 export async function deleteDbLead(id: string): Promise<boolean> {
   if (!sql) return false;
   try {
-    await sql`DELETE FROM leads WHERE id = ${id};`;
+    await sql`DELETE FROM terrenos_leads WHERE id = ${id};`;
     return true;
   } catch (err) {
     console.error("Erro ao eliminar lead no Neon:", err);
@@ -155,7 +155,7 @@ export async function deleteDbLead(id: string): Promise<boolean> {
 export async function deleteDbLeads(ids: string[]): Promise<boolean> {
   if (!sql || ids.length === 0) return false;
   try {
-    await sql`DELETE FROM leads WHERE id = ANY(${ids});`;
+    await sql`DELETE FROM terrenos_leads WHERE id = ANY(${ids});`;
     return true;
   } catch (err) {
     console.error("Erro ao eliminar múltiplas leads no Neon:", err);

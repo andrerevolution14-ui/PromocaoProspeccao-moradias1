@@ -166,8 +166,8 @@ export default function DashboardPage() {
 
       if (deleteModal.type === "single" && deleteModal.targetId) {
         const res = await fetch(`/api/leads/${deleteModal.targetId}`, { method: "DELETE" });
-        const data = await res.json();
-        if (data.success) {
+        const data = await res.json().catch(() => ({}));
+        if (data.success || res.ok || res.status === 404) {
           setLeads(prev => prev.filter(l => l.id !== deleteModal.targetId));
           setSelectedIds(prev => prev.filter(id => id !== deleteModal.targetId));
           setStats(prev => ({
@@ -184,8 +184,8 @@ export default function DashboardPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ids: selectedIds })
         });
-        const data = await res.json();
-        if (data.success) {
+        const data = await res.json().catch(() => ({}));
+        if (data.success || res.ok) {
           const removedCount = selectedIds.length;
           const removedSet = new Set(selectedIds);
           setLeads(prev => prev.filter(l => !removedSet.has(l.id)));

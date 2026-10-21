@@ -78,30 +78,28 @@ export async function POST(request: Request) {
     const eventId =
       body.eventId || `lead_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    let createdLeadId: string | undefined = undefined;
-
-    // 2. Gravar no CRM / Base de Dados APENAS se for formulário real ou tiver contacto
-    // Isto evita que meros cliques em links de WhatsApp criem dezenas de leads vazias no dashboard
-    if (isForm || phone.replace(/\D/g, "").length >= 9) {
-      const newLead = await saveLead({
-        source: isForm ? "Formulário" : "Clique WhatsApp",
-        ctaOrigin: body.ctaOrigin || (isForm ? "Formulário" : "Botão WhatsApp"),
-        role: body.role || "Não especificado",
-        location: body.location || "",
-        askingPrice: body.askingPrice || "",
-        message: body.message || (isForm ? "Formulário submetido" : "Clique para WhatsApp"),
-        referrer: referrer,
-        device: device,
-        userAgent: userAgent,
-        status: "Novo",
-        notes: body.notes || "",
-        name: name || undefined,
-        phone: phone || undefined,
-        projectStatus: body.projectStatus || undefined,
-        area: body.area || undefined
-      });
-      createdLeadId = newLead.id;
-    }
+    // 2. Gravar no CRM / Base de Dados
+    // Quer seja submissão do formulário curto, quer seja clique para WhatsApp,
+    // o registo entra sempre no painel para que nenhum contacto se perca
+    const leadName = name || (isForm ? "Contacto do Formulário" : "Contacto WhatsApp");
+    const newLead = await saveLead({
+      source: isForm ? "Formulário" : "Clique WhatsApp",
+      ctaOrigin: body.ctaOrigin || (isForm ? "Formulário" : "Botão WhatsApp"),
+      role: body.role || (isForm ? "Proprietário" : "Não especificado"),
+      location: body.location || "Aveiro",
+      askingPrice: body.askingPrice || "",
+      message: body.message || (isForm ? "Formulário submetido" : "Contacto iniciado via WhatsApp"),
+      referrer: referrer,
+      device: device,
+      userAgent: userAgent,
+      status: "Novo",
+      notes: body.notes || (isForm ? "Recebido via formulário interativo" : "Contacto iniciado via WhatsApp"),
+      name: leadName,
+      phone: phone || undefined,
+      projectStatus: body.projectStatus || undefined,
+      area: body.area || undefined
+    });
+    const createdLeadId = newLead.id;
 
     // 3. Envio para a Meta Conversions API (CAPI)
     const firstName = name.split(/\s+/)[0] || undefined;

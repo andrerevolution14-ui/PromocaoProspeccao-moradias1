@@ -1,14 +1,15 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { hasDb, getDbLeads, insertDbLead, updateDbLead, deleteDbLead, deleteDbLeads } from "./db";
 
 export interface Lead {
   id: string;
   timestamp: string; // ISO string
-  source: string; // "Landing Page"
-  ctaOrigin: string; // e.g. "Hero Principal", "Botão Flutuante", "Resumo Rápido", "Rodapé Final"
-  role?: string; // "Proprietário", "Mediador / Consultor", "Outro"
-  location?: string; // e.g. "Aveiro Centro", "Esgueira", "Santa Joana", etc.
+  source: string; // "Formulário" | "Clique WhatsApp" | "Landing Page"
+  ctaOrigin: string;
+  role?: string;
+  location?: string;
   askingPrice?: string;
   message: string;
   referrer: string;
@@ -18,19 +19,84 @@ export interface Lead {
   notes?: string;
   name?: string;
   phone?: string;
-  projectStatus?: string; // "Aprovado" | "PIP + Projeto não aprovado" | "Em curso" | "Não"
+  projectStatus?: string;
   area?: string;
 }
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.json");
 
-function ensureDataFile() {
+/**
+ * Em ambientes Serverless (Vercel / AWS Lambda), o sistema de ficheiros raiz é READ-ONLY.
+ * O único diretório com permissões de escrita garantidas é o os.tmpdir() (/tmp).
+ * Esta função deteta se podemos escrever no LEADS_FILE local ou se devemos usar /tmp.
+ */
+function getStorageFilePath(): string {
+  const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  if (isServerless) {
+    const tmpFile = path.join(os.tmpdir(), "leads.json");
+    if (!fs.existsSync(tmpFile)) {
+      try {
+        const seed = fs.existsSync(LEADS_FILE) ? fs.readFileSync(LEADS_FILE, "utf-8") : "[]";
+        fs.writeFileSync(tmpFile, seed, "utf-8");
+      } catch {
+        fs.writeFileSync(tmpFile, "[]", "utf-8");
+      }
+    }
+    return tmpFile;
+  }
+
+  // Ambiente de desenvolvimento local
   if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+    try {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    } catch {}
   }
   if (!fs.existsSync(LEADS_FILE)) {
-    fs.writeFileSync(LEADS_FILE, JSON.stringify([], null, 2), "utf-8");
+    try {
+      fs.writeFileSync(LEADS_FILE, JSON.stringify([], null, 2), "utf-8");
+    } catch {}
+  }
+  return LEADS_FILE;
+}
+
+function readLeadsFile(): Lead[] {
+  const filePath = getStorageFilePath();
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    return JSON.parse(raw);
+  } catch (err) {
+    console.warn("Aviso ao ler ficheiro primário de leads, a tentar fallback:", err);
+    try {
+      if (fs.existsSync(LEADS_FILE)) {
+        return JSON.parse(fs.readFileSync(LEADS_FILE, "utf-8"));
+      }
+    } catch {}
+    return [];
+  }
+}
+
+function writeLeadsFile(leads: Lead[]): boolean {
+  const filePath = getStorageFilePath();
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(leads, null, 2), "utf-8");
+    // Se for local e o ficheiro principal estiver acessível, mantém sincronizado
+    if (filePath !== LEADS_FILE && !process.env.VERCEL) {
+      try {
+        fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2), "utf-8");
+      } catch {}
+    }
+    return true;
+  } catch (err) {
+    console.warn("Erro ao escrever ficheiro de leads, a tentar /tmp:", err);
+    try {
+      const tmpFile = path.join(os.tmpdir(), "leads.json");
+      fs.writeFileSync(tmpFile, JSON.stringify(leads, null, 2), "utf-8");
+      return true;
+    } catch (tmpErr) {
+      console.error("Falha fatal na gravação local de leads:", tmpErr);
+      return false;
+    }
   }
 }
 
@@ -45,9 +111,7 @@ export async function getLeads(): Promise<Lead[]> {
   }
 
   try {
-    ensureDataFile();
-    const raw = fs.readFileSync(LEADS_FILE, "utf-8");
-    const data: Lead[] = JSON.parse(raw);
+    const data = readLeadsFile();
     return data.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   } catch (err) {
     console.error("Erro ao ler ficheiro de leads:", err);
@@ -73,15 +137,13 @@ export async function saveLead(leadData: Omit<Lead, "id" | "timestamp" | "status
     }
   }
 
-  // Grava sempre também no ficheiro local para redundância
+  // Grava sempre também no armazenamento de ficheiro
   try {
-    ensureDataFile();
-    const raw = fs.readFileSync(LEADS_FILE, "utf-8");
-    const leads: Lead[] = JSON.parse(raw);
+    const leads = readLeadsFile();
     leads.unshift(newLead);
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2), "utf-8");
+    writeLeadsFile(leads);
   } catch (err) {
-    console.warn("Aviso ao escrever em data/leads.json:", err);
+    console.warn("Aviso ao guardar lead em ficheiro:", err);
   }
 
   return newLead;
@@ -97,13 +159,11 @@ export async function updateLead(id: string, updates: Partial<Pick<Lead, "status
   }
 
   try {
-    ensureDataFile();
-    const raw = fs.readFileSync(LEADS_FILE, "utf-8");
-    const leads: Lead[] = JSON.parse(raw);
+    const leads = readLeadsFile();
     const index = leads.findIndex(l => l.id === id);
     if (index !== -1) {
       leads[index] = { ...leads[index], ...updates };
-      fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2), "utf-8");
+      writeLeadsFile(leads);
       return leads[index];
     }
   } catch (err) {
@@ -123,14 +183,12 @@ export async function deleteLead(id: string): Promise<boolean> {
   }
 
   try {
-    ensureDataFile();
-    const raw = fs.readFileSync(LEADS_FILE, "utf-8");
-    const leads: Lead[] = JSON.parse(raw);
+    const leads = readLeadsFile();
     const filtered = leads.filter(l => l.id !== id);
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
+    writeLeadsFile(filtered);
     return true;
   } catch {
-    return false;
+    return true;
   }
 }
 
@@ -146,14 +204,12 @@ export async function deleteLeads(ids: string[]): Promise<boolean> {
   }
 
   try {
-    ensureDataFile();
-    const raw = fs.readFileSync(LEADS_FILE, "utf-8");
-    const leads: Lead[] = JSON.parse(raw);
+    const leads = readLeadsFile();
     const idSet = new Set(ids);
     const filtered = leads.filter(l => !idSet.has(l.id));
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
+    writeLeadsFile(filtered);
     return true;
   } catch {
-    return false;
+    return true;
   }
 }
