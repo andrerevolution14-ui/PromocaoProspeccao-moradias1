@@ -52,23 +52,23 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Repor lead do Francisco Picado a pedido do utilizador
+    // Repor lead do Francisco Picado com os dados reais submetidos
     if (body.restoreFrancisco) {
       const restored = await saveLead({
         source: "Formulário",
-        ctaOrigin: "Formulário de Qualificação",
+        ctaOrigin: "Hero Formulário",
         role: "Proprietário",
-        location: "Aveiro",
+        location: "Oliveirinha",
         askingPrice: "",
-        message: "Contacto e pedido de análise de terreno com projeto - Francisco Picado",
-        referrer: "Acesso Direto",
+        message: "Formulário: Oliveirinha | Projeto: PIP + Projeto não aprovado | Área: 300 a 500 m²",
+        referrer: "http://m.facebook.com/",
         device: "Mobile",
         status: "Novo",
         notes: "Lead preservada no sistema",
         name: "Francisco Picado",
-        phone: body.phone || "910 000 000",
-        projectStatus: "Aprovado",
-        area: "Terreno em Aveiro"
+        phone: body.phone || "964148762",
+        projectStatus: "PIP + Projeto não aprovado",
+        area: "300 a 500 m²"
       });
       return NextResponse.json({ success: true, lead: restored });
     }

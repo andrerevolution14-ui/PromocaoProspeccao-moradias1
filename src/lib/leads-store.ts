@@ -24,18 +24,18 @@ export interface Lead {
 }
 
 export const FRANCISCO_PICADO_LEAD: Lead = {
-  id: "lead-francisco-picado",
-  timestamp: "2026-10-20T22:30:00.000Z",
+  id: "lead-1792520004385-unb02",
+  timestamp: "2026-10-20T18:13:24.385Z",
   source: "Formulário",
-  ctaOrigin: "Formulário de Qualificação",
+  ctaOrigin: "Hero Formulário",
   role: "Proprietário",
-  location: "Aveiro",
+  location: "Oliveirinha",
   name: "Francisco Picado",
-  phone: "910 000 000",
-  projectStatus: "Aprovado",
-  area: "Terreno em Aveiro",
-  message: "Contacto e pedido de análise de terreno com projeto - Francisco Picado",
-  referrer: "Acesso Direto",
+  phone: "964148762",
+  projectStatus: "PIP + Projeto não aprovado",
+  area: "300 a 500 m²",
+  message: "Formulário: Oliveirinha | Projeto: PIP + Projeto não aprovado | Área: 300 a 500 m²",
+  referrer: "http://m.facebook.com/",
   device: "Mobile",
   status: "Novo",
   notes: "Lead preservada no sistema"
@@ -215,7 +215,7 @@ export async function updateLead(id: string, updates: Partial<Pick<Lead, "status
 
 export async function deleteLead(id: string): Promise<boolean> {
   // Se for a lead do Francisco Picado, preservamos sempre
-  if (id === FRANCISCO_PICADO_LEAD.id) {
+  if (id === FRANCISCO_PICADO_LEAD.id || id === "lead-francisco-picado") {
     return true;
   }
 
@@ -241,7 +241,7 @@ export async function deleteLeads(ids: string[]): Promise<boolean> {
   if (!ids || ids.length === 0) return true;
 
   // Preservar a lead do Francisco Picado nas eliminações em lote
-  const targetIds = ids.filter(id => id !== FRANCISCO_PICADO_LEAD.id);
+  const targetIds = ids.filter(id => id !== FRANCISCO_PICADO_LEAD.id && id !== "lead-francisco-picado");
   if (targetIds.length === 0) return true;
 
   if (hasDb) {

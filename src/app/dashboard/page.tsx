@@ -579,7 +579,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             filteredLeads.map((lead) => {
-              const isFrancisco = lead.id === "lead-francisco-picado" || Boolean(lead.name && lead.name.toLowerCase().includes("picado"));
+              const isFrancisco = lead.id === "lead-francisco-picado" || lead.id === "lead-1792520004385-unb02" || Boolean(lead.name && lead.name.toLowerCase().includes("picado"));
               const isSelected = selectedIds.includes(lead.id);
               const dateObj = new Date(lead.timestamp);
               const dateFormatted = dateObj.toLocaleDateString("pt-PT", {
@@ -768,7 +768,7 @@ export default function DashboardPage() {
                   </tr>
                 ) : (
                   filteredLeads.map((lead) => {
-                    const isFrancisco = lead.id === "lead-francisco-picado" || Boolean(lead.name && lead.name.toLowerCase().includes("picado"));
+                    const isFrancisco = lead.id === "lead-francisco-picado" || lead.id === "lead-1792520004385-unb02" || Boolean(lead.name && lead.name.toLowerCase().includes("picado"));
                     const isSelected = selectedIds.includes(lead.id);
                     const dateObj = new Date(lead.timestamp);
                     const dateFormatted = dateObj.toLocaleDateString("pt-PT", {
