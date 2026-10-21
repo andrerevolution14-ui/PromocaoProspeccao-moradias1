@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLeads, saveLead } from "@/lib/leads-store";
+import { getLeads, saveLead, deleteLeads } from "@/lib/leads-store";
 import { sendMetaConversionsApiEvent } from "@/lib/meta-capi";
 
 export async function GET() {
@@ -78,26 +78,32 @@ export async function POST(request: Request) {
     const eventId =
       body.eventId || `lead_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // 2. Gravar no CRM / Base de Dados
-    const newLead = await saveLead({
-      source: isForm ? "Formulário" : "Clique WhatsApp",
-      ctaOrigin: body.ctaOrigin || (isForm ? "Formulário" : "Botão WhatsApp"),
-      role: body.role || "Não especificado",
-      location: body.location || "",
-      askingPrice: body.askingPrice || "",
-      message: body.message || (isForm ? "Formulário submetido" : "Clique para WhatsApp"),
-      referrer: referrer,
-      device: device,
-      userAgent: userAgent,
-      status: "Novo",
-      notes: body.notes || "",
-      name: name || undefined,
-      phone: phone || undefined,
-      projectStatus: body.projectStatus || undefined,
-      area: body.area || undefined
-    });
+    let createdLeadId: string | undefined = undefined;
 
-    // 3. Envio para a Meta Conversions API (CAPI) — Lead só para formulários
+    // 2. Gravar no CRM / Base de Dados APENAS se for formulário real ou tiver contacto
+    // Isto evita que meros cliques em links de WhatsApp criem dezenas de leads vazias no dashboard
+    if (isForm || phone.replace(/\D/g, "").length >= 9) {
+      const newLead = await saveLead({
+        source: isForm ? "Formulário" : "Clique WhatsApp",
+        ctaOrigin: body.ctaOrigin || (isForm ? "Formulário" : "Botão WhatsApp"),
+        role: body.role || "Não especificado",
+        location: body.location || "",
+        askingPrice: body.askingPrice || "",
+        message: body.message || (isForm ? "Formulário submetido" : "Clique para WhatsApp"),
+        referrer: referrer,
+        device: device,
+        userAgent: userAgent,
+        status: "Novo",
+        notes: body.notes || "",
+        name: name || undefined,
+        phone: phone || undefined,
+        projectStatus: body.projectStatus || undefined,
+        area: body.area || undefined
+      });
+      createdLeadId = newLead.id;
+    }
+
+    // 3. Envio para a Meta Conversions API (CAPI)
     const firstName = name.split(/\s+/)[0] || undefined;
     const capiPromise = sendMetaConversionsApiEvent({
       eventName: eventType,
@@ -117,19 +123,42 @@ export async function POST(request: Request) {
       return null;
     });
 
-    // Em serverless o processo pode terminar antes do envio: aguardamos nas leads reais
     if (isForm) await capiPromise;
 
     return NextResponse.json(
       {
         success: true,
-        lead: { id: newLead.id },
+        lead: createdLeadId ? { id: createdLeadId } : undefined,
         metaTracking: { eventId, eventType }
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("API POST Lead erro:", error);
-    return NextResponse.json({ success: false, error: "Falha ao gravar lead" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Falha ao processar pedido" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const { ids, all, exceptId } = body;
+
+    if (Array.isArray(ids) && ids.length > 0) {
+      const ok = await deleteLeads(ids);
+      return NextResponse.json({ success: ok, count: ids.length, message: `${ids.length} leads eliminadas` });
+    }
+
+    if (all) {
+      const allLeads = await getLeads();
+      const toDelete = exceptId ? allLeads.filter(l => l.id !== exceptId).map(l => l.id) : allLeads.map(l => l.id);
+      const ok = await deleteLeads(toDelete);
+      return NextResponse.json({ success: ok, count: toDelete.length, message: `${toDelete.length} leads eliminadas` });
+    }
+
+    return NextResponse.json({ success: false, error: "Nenhum identificador fornecido" }, { status: 400 });
+  } catch (err) {
+    console.error("API DELETE Leads erro:", err);
+    return NextResponse.json({ success: false, error: "Falha ao eliminar leads" }, { status: 500 });
   }
 }

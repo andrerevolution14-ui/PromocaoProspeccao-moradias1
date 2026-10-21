@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { hasDb, getDbLeads, insertDbLead, updateDbLead, deleteDbLead } from "./db";
+import { hasDb, getDbLeads, insertDbLead, updateDbLead, deleteDbLead, deleteDbLeads } from "./db";
 
 export interface Lead {
   id: string;
@@ -30,54 +30,7 @@ function ensureDataFile() {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
   if (!fs.existsSync(LEADS_FILE)) {
-    const initialLeads: Lead[] = [
-      {
-        id: "lead-aveiro-201",
-        timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
-        source: "Landing Page",
-        ctaOrigin: "Hero Principal",
-        role: "Proprietário",
-        location: "Esgueira",
-        askingPrice: "145.000 €",
-        message: "Olá André, tenho um terreno em Esgueira com projeto de arquitetura aprovado para moradia térrea T3, valor pretendido: 145.000 €. Gostaria de enviar a planta em PDF para análise.",
-        referrer: "Direct / Google Ads",
-        device: "Mobile",
-        userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
-        status: "Em Análise",
-        notes: "Projeto T3 térrea com licença a pagamento. Resposta enviada no WhatsApp."
-      },
-      {
-        id: "lead-aveiro-202",
-        timestamp: new Date(Date.now() - 3600000 * 18).toISOString(),
-        source: "Landing Page",
-        ctaOrigin: "Hero Principal",
-        role: "Proprietário",
-        location: "Aveiro Centro (Glória)",
-        askingPrice: "210.000 €",
-        message: "Olá André, tenho um terreno em Aveiro Centro com projeto aprovado, valor pretendido: 210.000 €. Gostaria de enviar a planta em PDF para análise.",
-        referrer: "https://grupofreitasrenovacoes.pt/",
-        device: "Desktop",
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-        status: "Contactado",
-        notes: "Lote excelente. Análise de engenharia em curso para CPCV."
-      },
-      {
-        id: "lead-aveiro-203",
-        timestamp: new Date(Date.now() - 3600000 * 40).toISOString(),
-        source: "Landing Page",
-        ctaOrigin: "Botão Flutuante WhatsApp",
-        role: "Mediador / Consultor",
-        location: "Santa Joana",
-        askingPrice: "175.000 €",
-        message: "Olá André, represento o proprietário de um lote em Santa Joana com PIP aprovado para 2 moradias.",
-        referrer: "Instagram Ads",
-        device: "Mobile",
-        userAgent: "Mozilla/5.0 (Linux; Android 14)",
-        status: "Novo",
-        notes: "Aguarda receção de projeto de execução."
-      }
-    ];
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(initialLeads, null, 2), "utf-8");
+    fs.writeFileSync(LEADS_FILE, JSON.stringify([], null, 2), "utf-8");
   }
 }
 
@@ -174,6 +127,30 @@ export async function deleteLead(id: string): Promise<boolean> {
     const raw = fs.readFileSync(LEADS_FILE, "utf-8");
     const leads: Lead[] = JSON.parse(raw);
     const filtered = leads.filter(l => l.id !== id);
+    fs.writeFileSync(LEADS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function deleteLeads(ids: string[]): Promise<boolean> {
+  if (!ids || ids.length === 0) return true;
+
+  if (hasDb) {
+    try {
+      await deleteDbLeads(ids);
+    } catch (e) {
+      console.warn("Erro no bulk delete Neon DB:", e);
+    }
+  }
+
+  try {
+    ensureDataFile();
+    const raw = fs.readFileSync(LEADS_FILE, "utf-8");
+    const leads: Lead[] = JSON.parse(raw);
+    const idSet = new Set(ids);
+    const filtered = leads.filter(l => !idSet.has(l.id));
     fs.writeFileSync(LEADS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
     return true;
   } catch {

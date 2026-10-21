@@ -148,3 +148,17 @@ export async function deleteDbLead(id: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Elimina múltiplas leads no Neon
+ */
+export async function deleteDbLeads(ids: string[]): Promise<boolean> {
+  if (!sql || ids.length === 0) return false;
+  try {
+    await sql`DELETE FROM leads WHERE id = ANY(${ids});`;
+    return true;
+  } catch (err) {
+    console.error("Erro ao eliminar múltiplas leads no Neon:", err);
+    return false;
+  }
+}
