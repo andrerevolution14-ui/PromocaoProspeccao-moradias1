@@ -24,7 +24,8 @@ import {
   Square,
   Phone,
   User,
-  ShieldCheck
+  ShieldCheck,
+  Plus
 } from "lucide-react";
 import { Lead } from "@/lib/leads-store";
 
@@ -117,6 +118,26 @@ export default function DashboardPage() {
       }
     } catch {
       showTemporaryMessage("Erro ao guardar notas");
+    }
+  };
+
+  const handleRestoreFrancisco = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ restoreFrancisco: true })
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchLeads();
+        showTemporaryMessage("Lead do Francisco Picado reposta com sucesso!");
+      }
+    } catch {
+      showTemporaryMessage("Erro ao repor lead");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -393,6 +414,18 @@ export default function DashboardPage() {
               </button>
             )}
 
+            {!leads.some(l => l.name?.toLowerCase().includes("picado")) && (
+              <button
+                onClick={handleRestoreFrancisco}
+                disabled={loading}
+                className="inline-flex items-center gap-1.5 bg-[#B45309] hover:bg-[#92400E] text-white py-2.5 px-3.5 rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                title="Repor o registo do Francisco Picado"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Repor Francisco Picado</span>
+              </button>
+            )}
+
             <a
               href="/api/leads/export"
               download
@@ -532,10 +565,21 @@ export default function DashboardPage() {
             </div>
           ) : filteredLeads.length === 0 ? (
             <div className="p-8 text-center bg-white rounded-2xl border border-[#E7DFD5] text-[#78716C] text-sm">
-              Nenhuma lead encontrada com os critérios selecionados.
+              <p>Nenhuma lead encontrada com os critérios selecionados.</p>
+              {!leads.some(l => l.name?.toLowerCase().includes("picado")) && (
+                <button
+                  onClick={handleRestoreFrancisco}
+                  disabled={loading}
+                  className="mt-3.5 inline-flex items-center gap-1.5 bg-[#1C1917] hover:bg-[#292524] text-white py-2 px-3.5 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5 text-[#B45309]" />
+                  <span>Repor Lead Francisco Picado</span>
+                </button>
+              )}
             </div>
           ) : (
             filteredLeads.map((lead) => {
+              const isFrancisco = lead.id === "lead-francisco-picado" || Boolean(lead.name && lead.name.toLowerCase().includes("picado"));
               const isSelected = selectedIds.includes(lead.id);
               const dateObj = new Date(lead.timestamp);
               const dateFormatted = dateObj.toLocaleDateString("pt-PT", {
@@ -565,9 +609,15 @@ export default function DashboardPage() {
                         className="w-4 h-4 mt-0.5 rounded text-[#B45309] focus:ring-[#B45309] cursor-pointer"
                       />
                       <div>
-                        <div className="font-extrabold text-[#1C1917] text-sm flex items-center gap-1.5">
+                        <div className="font-extrabold text-[#1C1917] text-sm flex items-center gap-1.5 flex-wrap">
                           <User className="w-3.5 h-3.5 text-[#B45309]" />
                           <span>{lead.name || "Lead sem nome"}</span>
+                          {isFrancisco && (
+                            <span className="inline-flex items-center gap-1 text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded-md">
+                              <ShieldCheck className="w-3 h-3 text-amber-700" />
+                              Referência
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-[#78716C]">
                           {dateFormatted} às {timeFormatted} • {lead.source}
@@ -575,14 +625,24 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => openSingleDelete(lead)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors cursor-pointer shrink-0"
-                      title="Eliminar lead"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                      <span>Eliminar</span>
-                    </button>
+                    {isFrancisco ? (
+                      <span
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-lg shrink-0 cursor-default"
+                        title="Esta lead é a referência protegida do sistema"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Protegida</span>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => openSingleDelete(lead)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors cursor-pointer shrink-0"
+                        title="Eliminar lead"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-red-600" />
+                        <span>Eliminar</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Card Body */}
@@ -693,11 +753,22 @@ export default function DashboardPage() {
                 ) : filteredLeads.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="py-12 text-center text-[#78716C]">
-                      Nenhuma lead encontrada com os critérios selecionados.
+                      <p>Nenhuma lead encontrada com os critérios selecionados.</p>
+                      {!leads.some(l => l.name?.toLowerCase().includes("picado")) && (
+                        <button
+                          onClick={handleRestoreFrancisco}
+                          disabled={loading}
+                          className="mt-3 inline-flex items-center gap-1.5 bg-[#1C1917] hover:bg-[#292524] text-white py-2 px-4 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5 text-[#B45309]" />
+                          <span>Repor Lead Francisco Picado</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ) : (
                   filteredLeads.map((lead) => {
+                    const isFrancisco = lead.id === "lead-francisco-picado" || Boolean(lead.name && lead.name.toLowerCase().includes("picado"));
                     const isSelected = selectedIds.includes(lead.id);
                     const dateObj = new Date(lead.timestamp);
                     const dateFormatted = dateObj.toLocaleDateString("pt-PT", {
@@ -751,7 +822,15 @@ export default function DashboardPage() {
                         {/* Perfil & Local */}
                         <td className="py-3.5 px-4">
                           {lead.name && (
-                            <div className="font-extrabold text-[#1C1917] text-sm">{lead.name}</div>
+                            <div className="font-extrabold text-[#1C1917] text-sm flex items-center gap-1.5 flex-wrap">
+                              <span>{lead.name}</span>
+                              {isFrancisco && (
+                                <span className="inline-flex items-center gap-1 text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded-md">
+                                  <ShieldCheck className="w-3 h-3 text-amber-700" />
+                                  Referência
+                                </span>
+                              )}
+                            </div>
                           )}
                           {lead.phone && (
                             <div className="flex items-center gap-2 mt-0.5">
@@ -872,14 +951,24 @@ export default function DashboardPage() {
 
                         {/* Ações (Fixa à direita para ser sempre visível) */}
                         <td className="py-3.5 px-4 text-center whitespace-nowrap sticky right-0 bg-white/95 backdrop-blur-xs shadow-xs">
-                          <button
-                            onClick={() => openSingleDelete(lead)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors cursor-pointer"
-                            title="Eliminar esta lead"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-red-600" />
-                            <span>Eliminar</span>
-                          </button>
+                          {isFrancisco ? (
+                            <span
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-lg cursor-default"
+                              title="Esta lead é a referência protegida do sistema"
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                              <span>Protegida</span>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => openSingleDelete(lead)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors cursor-pointer"
+                              title="Eliminar esta lead"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-red-600" />
+                              <span>Eliminar</span>
+                            </button>
+                          )}
                         </td>
 
                       </tr>

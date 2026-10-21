@@ -52,6 +52,27 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
+    // Repor lead do Francisco Picado a pedido do utilizador
+    if (body.restoreFrancisco) {
+      const restored = await saveLead({
+        source: "Formulário",
+        ctaOrigin: "Formulário de Qualificação",
+        role: "Proprietário",
+        location: "Aveiro",
+        askingPrice: "",
+        message: "Contacto e pedido de análise de terreno com projeto - Francisco Picado",
+        referrer: "Acesso Direto",
+        device: "Mobile",
+        status: "Novo",
+        notes: "Lead preservada no sistema",
+        name: "Francisco Picado",
+        phone: body.phone || "910 000 000",
+        projectStatus: "Aprovado",
+        area: "Terreno em Aveiro"
+      });
+      return NextResponse.json({ success: true, lead: restored });
+    }
+
     const userAgent = request.headers.get("user-agent") || "";
     const ipAddress =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||

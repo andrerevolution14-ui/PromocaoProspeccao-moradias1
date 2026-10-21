@@ -23,6 +23,24 @@ export interface Lead {
   area?: string;
 }
 
+export const FRANCISCO_PICADO_LEAD: Lead = {
+  id: "lead-francisco-picado",
+  timestamp: "2026-10-20T22:30:00.000Z",
+  source: "Formulário",
+  ctaOrigin: "Formulário de Qualificação",
+  role: "Proprietário",
+  location: "Aveiro",
+  name: "Francisco Picado",
+  phone: "910 000 000",
+  projectStatus: "Aprovado",
+  area: "Terreno em Aveiro",
+  message: "Contacto e pedido de análise de terreno com projeto - Francisco Picado",
+  referrer: "Acesso Direto",
+  device: "Mobile",
+  status: "Novo",
+  notes: "Lead preservada no sistema"
+};
+
 const DATA_DIR = path.join(process.cwd(), "data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.json");
 
@@ -37,10 +55,10 @@ function getStorageFilePath(): string {
     const tmpFile = path.join(os.tmpdir(), "leads.json");
     if (!fs.existsSync(tmpFile)) {
       try {
-        const seed = fs.existsSync(LEADS_FILE) ? fs.readFileSync(LEADS_FILE, "utf-8") : "[]";
+        const seed = fs.existsSync(LEADS_FILE) ? fs.readFileSync(LEADS_FILE, "utf-8") : JSON.stringify([FRANCISCO_PICADO_LEAD], null, 2);
         fs.writeFileSync(tmpFile, seed, "utf-8");
       } catch {
-        fs.writeFileSync(tmpFile, "[]", "utf-8");
+        fs.writeFileSync(tmpFile, JSON.stringify([FRANCISCO_PICADO_LEAD], null, 2), "utf-8");
       }
     }
     return tmpFile;
@@ -54,7 +72,7 @@ function getStorageFilePath(): string {
   }
   if (!fs.existsSync(LEADS_FILE)) {
     try {
-      fs.writeFileSync(LEADS_FILE, JSON.stringify([], null, 2), "utf-8");
+      fs.writeFileSync(LEADS_FILE, JSON.stringify([FRANCISCO_PICADO_LEAD], null, 2), "utf-8");
     } catch {}
   }
   return LEADS_FILE;
@@ -101,22 +119,44 @@ function writeLeadsFile(leads: Lead[]): boolean {
 }
 
 export async function getLeads(): Promise<Lead[]> {
+  let leads: Lead[] = [];
+
   if (hasDb) {
     try {
       const dbLeads = await getDbLeads();
-      if (dbLeads && dbLeads.length > 0) return dbLeads;
+      if (dbLeads && dbLeads.length > 0) {
+        leads = dbLeads;
+      }
     } catch (e) {
       console.warn("Fallback para ficheiro JSON após erro Neon:", e);
     }
   }
 
-  try {
-    const data = readLeadsFile();
-    return data.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  } catch (err) {
-    console.error("Erro ao ler ficheiro de leads:", err);
-    return [];
+  if (leads.length === 0) {
+    try {
+      leads = readLeadsFile();
+    } catch (err) {
+      console.error("Erro ao ler ficheiro de leads:", err);
+      leads = [];
+    }
   }
+
+  // Garantir que a lead do Francisco Picado está SEMPRE presente no sistema
+  const hasFrancisco = leads.some(
+    (l) => l.id === FRANCISCO_PICADO_LEAD.id || (l.name && l.name.toLowerCase().includes("picado"))
+  );
+
+  if (!hasFrancisco) {
+    leads.unshift(FRANCISCO_PICADO_LEAD);
+    try {
+      writeLeadsFile(leads);
+      if (hasDb) {
+        insertDbLead(FRANCISCO_PICADO_LEAD).catch(() => {});
+      }
+    } catch {}
+  }
+
+  return leads.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 }
 
 export async function saveLead(leadData: Omit<Lead, "id" | "timestamp" | "status"> & { status?: Lead["status"]; notes?: string }): Promise<Lead> {
@@ -174,6 +214,11 @@ export async function updateLead(id: string, updates: Partial<Pick<Lead, "status
 }
 
 export async function deleteLead(id: string): Promise<boolean> {
+  // Se for a lead do Francisco Picado, preservamos sempre
+  if (id === FRANCISCO_PICADO_LEAD.id) {
+    return true;
+  }
+
   if (hasDb) {
     try {
       await deleteDbLead(id);
@@ -195,9 +240,13 @@ export async function deleteLead(id: string): Promise<boolean> {
 export async function deleteLeads(ids: string[]): Promise<boolean> {
   if (!ids || ids.length === 0) return true;
 
+  // Preservar a lead do Francisco Picado nas eliminações em lote
+  const targetIds = ids.filter(id => id !== FRANCISCO_PICADO_LEAD.id);
+  if (targetIds.length === 0) return true;
+
   if (hasDb) {
     try {
-      await deleteDbLeads(ids);
+      await deleteDbLeads(targetIds);
     } catch (e) {
       console.warn("Erro no bulk delete Neon DB:", e);
     }
@@ -205,7 +254,7 @@ export async function deleteLeads(ids: string[]): Promise<boolean> {
 
   try {
     const leads = readLeadsFile();
-    const idSet = new Set(ids);
+    const idSet = new Set(targetIds);
     const filtered = leads.filter(l => !idSet.has(l.id));
     writeLeadsFile(filtered);
     return true;
